@@ -87,7 +87,7 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 		// Check for the next guy's chop
 		// TODO
 
-		// Check for playable cards
+		// If we have playable cards, play them
 		a = d.CheckPlayable(g)
 		if a != nil {
 			return a
@@ -100,6 +100,7 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 		}
 	}
 
+	// If we have playable cards, play them
 	a = d.CheckPlayable(g)
 	if a != nil {
 		return a
