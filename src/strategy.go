@@ -1,16 +1,21 @@
 package main
 
 var (
-	stratStart          map[string]func(*Game)
-	stratGetAction      map[string]func(*Game) *Action
-	stratActionHappened map[string]func(*Game)
+	strategies map[string]func() *Strategy
 )
 
-func stratInit() {
-	stratStart = make(map[string]func(*Game))
-	stratGetAction = make(map[string]func(*Game) *Action)
-	stratActionHappened = make(map[string]func(*Game))
+type Strategy struct {
+	Name           string
+	Start          func(*Strategy)
+	GetAction      func(*Strategy, *Game) *Action
+	ActionHappened func(*Strategy, *Game)
+	Data           interface{}
+}
 
-	// New strategies that are added need to add their initialization function here
-	dumbInit()
+func stratInit() {
+	strategies = make(map[string]func() *Strategy)
+
+	// Add a line below for each new strategy
+	strategies["Dumb"] = NewDumb
+	strategies["Hyphen-ated"] = NewHyphenated
 }

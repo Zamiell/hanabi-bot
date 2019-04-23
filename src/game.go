@@ -25,7 +25,7 @@ type Game struct {
 
 type Action struct {
 	Type   int // 0 is clue, 1 is play, 2 is discard
-	Clue   Clue
+	Clue   *Clue
 	Target int
 }
 

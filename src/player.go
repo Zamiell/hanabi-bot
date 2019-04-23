@@ -8,7 +8,7 @@ type Player struct {
 	Index    int
 	Name     string
 	Hand     []*Card
-	Strategy string
+	Strategy *Strategy
 }
 
 func (p *Player) GiveClue(a *Action, g *Game) {

@@ -1,30 +1,76 @@
+/*
+	The "Dumb" strategy will alternate between blind-playing slot 1 and giving a clue
+	It is just intended to be a reference strategy
+*/
+
 package main
 
-// Add the 3 functions to the function maps
-func dumbInit() {
-	name := "Dumb"
-	stratStart[name] = dumbStart
-	stratGetAction[name] = dumbGetAction
-	stratActionHappened[name] = dumbActionHappened
-}
-
-// Called at the beginning of the game
-func dumbStart(g *Game) {
-}
-
-// Called when it gets to the player's turn
-// Should returns the action that the player should perform
-func dumbGetAction(g *Game) *Action {
-	// Get the our slot 1 card
-	hand := g.Players[g.ActivePlayer].Hand
-	card := hand[len(hand)-1]
-
-	return &Action{
-		Type:   actionTypePlay,
-		Target: card.Order,
+func NewDumb() *Strategy {
+	return &Strategy{
+		Name:           "Dumb",
+		Start:          DumbStart,
+		GetAction:      DumbGetAction,
+		ActionHappened: DumbActionHappened,
+		Data:           &Dumb{},
 	}
 }
 
-// Called when an action happens
-func dumbActionHappened(g *Game) {
+type Dumb struct {
+	BlindPlay bool // True if the player will blind-play on the next turn
+}
+
+// DumbStart is called before the first move occurs
+func DumbStart(s *Strategy) {
+	d := s.Data.(*Dumb)
+
+	// We don't want to blind-play on the first turn
+	d.BlindPlay = true
+}
+
+// DumbGetAction is called when it gets to our turn
+// It returns the action that we will perform
+func DumbGetAction(s *Strategy, g *Game) *Action {
+	d := s.Data.(*Dumb)
+
+	// Alternate between two brainless strategies
+	d.InvertDumbness()
+
+	if d.BlindPlay && g.Clues > 0 {
+		// Get the our slot 1 card
+		hand := g.Players[g.ActivePlayer].Hand
+		firstCard := hand[len(hand)-1]
+
+		return &Action{
+			Type:   actionTypePlay,
+			Target: firstCard.Order,
+		}
+	}
+
+	// Get the next player
+	target := g.ActivePlayer + 1
+	if target >= len(g.Players) {
+		target = 0
+	}
+
+	// Get their slot 1
+	hand := g.Players[target].Hand
+	firstCard := hand[len(hand)-1]
+
+	return &Action{
+		Type: actionTypeClue,
+		Clue: &Clue{
+			Type:  clueTypeRank,
+			Value: firstCard.Rank,
+		},
+		Target: target,
+	}
+}
+
+// DumbActionHappened is called when an action happens
+func DumbActionHappened(s *Strategy, g *Game) {
+}
+
+// We can attach new functions to the Dumb struct
+func (d *Dumb) InvertDumbness() {
+	d.BlindPlay = !d.BlindPlay
 }
