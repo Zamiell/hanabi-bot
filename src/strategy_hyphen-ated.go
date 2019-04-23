@@ -59,14 +59,6 @@ func HyphenatedActionHappened(s *Strategy, g *Game, a *Action) {
 	d := s.Data.(*Hyphenated)
 
 	if a.Type == actionTypeClue {
-		p := g.Players[a.Target]
-		touchedCards := make([]*Card, 0)
-		for _, c := range p.Hand {
-			if c.JustTouched {
-				touchedCards = append(touchedCards, c)
-			}
-		}
-
 		interpretation := d.GetClueInterpretation(g, a)
 		if interpretation == hyphenClueTypePlay {
 			focusedCard := d.GetClueFocus(g, a.Target, a.Clue)
