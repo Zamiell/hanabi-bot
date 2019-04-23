@@ -98,22 +98,18 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 		if i == d.Us {
 			continue
 		}
-
-		for _, j := range []int{clueTypeRank, clueTypeColor} {
-			if j == clueTypeRank {
-				for _, k := range variants[g.Variant].Ranks {
-					clue := d.CheckViableClue(g, i, j, k)
-					if clue != nil {
-						viableClues = append(viableClues, clue)
-					}
-				}
-			} else if j == clueTypeColor {
-				for _, k := range variants[g.Variant].Suits {
-					clue := d.CheckViableClue(g, i, j, k.Index)
-					if clue != nil {
-						viableClues = append(viableClues, clue)
-					}
-				}
+		// Rank clues
+		for _, k := range variants[g.Variant].Ranks {
+			clue := d.CheckViableClue(g, i, clueTypeRank, k)
+			if clue != nil {
+				viableClues = append(viableClues, clue)
+			}
+		}
+		// Color clues
+		for _, k := range variants[g.Variant].Suits {
+			clue := d.CheckViableClue(g, i, clueTypeColor, k.Index)
+			if clue != nil {
+				viableClues = append(viableClues, clue)
 			}
 		}
 	}
