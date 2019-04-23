@@ -99,15 +99,15 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 			continue
 		}
 		// Rank clues
-		for _, k := range variants[g.Variant].Ranks {
+		for _, k := range variants[g.Variant].ClueRanks {
 			clue := d.CheckViableClue(g, i, clueTypeRank, k)
 			if clue != nil {
 				viableClues = append(viableClues, clue)
 			}
 		}
 		// Color clues
-		for _, k := range variants[g.Variant].Suits {
-			clue := d.CheckViableClue(g, i, clueTypeColor, k.Index)
+		for j, k := range variants[g.Variant].ClueColors {
+			clue := d.CheckViableClue(g, i, clueTypeColor, j)
 			if clue != nil {
 				viableClues = append(viableClues, clue)
 			}
