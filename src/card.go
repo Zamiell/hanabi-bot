@@ -8,7 +8,7 @@ type Card struct {
 	Suit  int
 	Rank  int
 	Order int
-	Clues []CardClue
+	Clues []*CardClue
 }
 
 type CardClue struct {

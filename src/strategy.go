@@ -11,5 +11,6 @@ func stratInit() {
 	stratGetAction = make(map[string]func(*Game) *Action)
 	stratActionHappened = make(map[string]func(*Game))
 
+	// New strategies that are added need to add their initialization function here
 	dumbInit()
 }
