@@ -27,6 +27,7 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 			Value:    a.Clue.Value,
 			Positive: positive,
 		})
+		c.JustTouched = positive
 
 		if a.Clue.Type == clueTypeRank {
 			clueRank := a.Clue.Value
@@ -54,7 +55,9 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 			}
 		}
 
-		// Remove the card possibilities from the card
+		if len(c.PossibleSuits) == 1 && len(c.PossibleRanks) == 1 {
+			c.Revealed = true
+		}
 	}
 
 	p2 := g.Players[a.Target]
@@ -66,6 +69,7 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 		str += "color " + color
 	}
 	log.Info(str)
+	log.Info("There are now " + strconv.Itoa(g.Clues) + " clues left.")
 }
 
 func (p *Player) RemoveCard(target int, g *Game) *Card {
@@ -81,7 +85,7 @@ func (p *Player) RemoveCard(target int, g *Game) *Card {
 
 func (p *Player) PlayCard(g *Game, c *Card) {
 	// Find out if this successfully plays
-	if c.Rank == g.Stacks[c.Suit.GetInteger(g)]+1 {
+	if c.IsPlayable(g) {
 		g.Score++
 		g.Stacks[c.Suit.GetInteger(g)] = c.Rank
 
@@ -96,15 +100,16 @@ func (p *Player) PlayCard(g *Game, c *Card) {
 			}
 		}
 
-		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " plays " + c.Name(g) + ".")
+		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " plays " + c.Name() + ".")
 	} else {
 		g.Strikes++
-		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " fails to plays " + c.Name(g) + ". The team is now at " + strconv.Itoa(g.Strikes) + " strikes.")
+		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " fails to plays " + c.Name() + ". The team is now at " + strconv.Itoa(g.Strikes) + " strikes.")
 	}
 }
 
 func (p *Player) DiscardCard(g *Game, c *Card) {
 	g.DiscardPile = append(g.DiscardPile, c)
+	log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " discards " + c.Name() + ".")
 }
 
 func (p *Player) DrawCard(g *Game) {
@@ -124,7 +129,7 @@ func (p *Player) DrawCard(g *Game) {
 		g.EndTurn = g.Turn + len(g.Players) + 1
 	}
 
-	log.Debug("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " draws a " + c.Name(g))
+	log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " draws a " + c.Name())
 }
 
 /*
@@ -149,4 +154,27 @@ func (p *Player) InHand(order int) bool {
 	}
 
 	return false
+}
+
+func (p *Player) GetCardsTouchedByClue(g *Game, clue *Clue) []*Card {
+	touchedCards := make([]*Card, 0)
+	for _, c := range p.Hand {
+		if variantIsCardTouched(g, clue, c) {
+			touchedCards = append(touchedCards, c)
+		}
+	}
+	return touchedCards
+}
+
+func (p *Player) GetFreshCardsTouchedByClue(g *Game, clue *Clue) []*Card {
+	freshCards := make([]*Card, 0)
+	for _, c := range p.Hand {
+		if c.IsClued() {
+			continue
+		}
+		if variantIsCardTouched(g, clue, c) {
+			freshCards = append(freshCards, c)
+		}
+	}
+	return freshCards
 }

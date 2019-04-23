@@ -14,8 +14,10 @@ type Suit struct {
 }
 
 func (s *Suit) GetInteger(g *Game) int {
+	log.Debug("-----")
 	for i, suit := range variants[g.Variant].Suits {
-		if suit == s {
+		log.Debug(suit.Name, s.Name)
+		if suit.Name == s.Name {
 			return i
 		}
 	}

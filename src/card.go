@@ -9,6 +9,7 @@ type Card struct {
 	Rank          int
 	Order         int
 	Clues         []*CardClue
+	JustTouched   bool // Touched by the last clue that was given
 	PossibleSuits []*Suit
 	PossibleRanks []int
 	PossibleCards map[string]int
@@ -20,9 +21,22 @@ type CardClue struct {
 	Positive bool
 }
 
-func (c *Card) Name(g *Game) string {
+func (c *Card) Name() string {
 	name := c.Suit.Name + " " + strconv.Itoa(c.Rank)
 	return name
+}
+
+func (c *Card) IsClued() bool {
+	for _, clue := range c.Clues {
+		if clue.Positive {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Card) IsPlayable(g *Game) bool {
+	return c.Rank == g.Stacks[c.Suit.GetInteger(g)]+1
 }
 
 func (c *Card) RemovePossibility(suit *Suit, rank int, removeAll bool) {

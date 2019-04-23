@@ -16,13 +16,17 @@ func NewHyphenated() *Strategy {
 }
 
 type Hyphenated struct {
-	OurIndex  int
-	Deck      []*HyphenCard
+	Us        int // Our index
+	Players   []*HyphenPlayer
+	Cards     []*HyphenCard
 	EarlyGame bool
 }
+type HyphenPlayer struct {
+	Chop int
+}
 type HyphenCard struct {
-	KnownPlayable bool
-	KnownTrash    bool
+	Playable bool
+	Trash    bool
 }
 
 // HyphenatedStart is called before the first move occurs
@@ -30,12 +34,40 @@ func HyphenatedStart(s *Strategy, g *Game, us int) {
 	d := s.Data.(*Hyphenated)
 
 	// Store which player we are
-	d.OurIndex = us
+	d.Us = us
 
-	// Make a copy of the deck that will store additional information about each card
-	d.Deck = make([]*HyphenCard, 0)
+	// We need to store additional information about each player
+	d.Players = make([]*HyphenPlayer, 0)
+	for i := 0; i < len(g.Players); i++ {
+		d.Players = append(d.Players, &HyphenPlayer{})
+	}
+
+	// We need to store additional information about each card
+	d.Cards = make([]*HyphenCard, 0)
 	for i := 0; i < len(g.Deck); i++ {
-		d.Deck = append(d.Deck, &HyphenCard{})
+		d.Cards = append(d.Cards, &HyphenCard{})
+	}
+}
+
+// HyphenatedActionHappened is called when an action happens
+func HyphenatedActionHappened(s *Strategy, g *Game, a *Action) {
+	d := s.Data.(*Hyphenated)
+
+	if a.Type == actionTypeClue {
+		p := g.Players[a.Target]
+		touchedCards := make([]*Card, 0)
+		for _, c := range p.Hand {
+			if c.JustTouched {
+				touchedCards = append(touchedCards, c)
+			}
+		}
+
+		focusedCard := d.FindClueFocus(g, a.Target, a.Clue)
+
+		// Assume that all clues are play clues
+		d.Cards[focusedCard.Order].Playable = true
+
+		d.UpdateChop(g, a)
 	}
 }
 
@@ -47,11 +79,16 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 
 	if g.Clues > 0 {
 		// Check for the next guy's chop
+		// TODO
 
 		// Check for playable cards
+		a = d.CheckPlayable(g)
+		if a != nil {
+			return a
+		}
 
 		// Clue playable cards
-		a = d.LookFor1s(g)
+		a = d.CheckPlayClues(g)
 		if a != nil {
 			return a
 		}
@@ -62,25 +99,10 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 		return a
 	}
 
-	return nil
-}
-
-// HyphenatedActionHappened is called when an action happens
-func HyphenatedActionHappened(s *Strategy, g *Game, a *Action) {
-	// d := s.Data.(*Hyphenated)
-
-	if a.Type == actionTypeClue {
-
+	a = d.Discard(g)
+	if a != nil {
+		return a
 	}
-}
 
-func (d *Hyphenated) CheckPlayable(g *Game) *Action {
-	// Look through our whole hand and make a list of all the playable cards
-	// TODO
-	return nil
-}
-
-func (d *Hyphenated) LookFor1s(g *Game) *Action {
-	// TODO
 	return nil
 }

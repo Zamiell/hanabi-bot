@@ -92,7 +92,7 @@ func actionPlay(g *Game, p *Player, a *Action) {
 func actionDiscard(g *Game, p *Player, a *Action) {
 	// Validate that the card is in their hand
 	if !p.InHand(a.Target) {
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to play a card that was " +
+		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to discard a card that was " +
 			"not in their hand.")
 		return
 	}

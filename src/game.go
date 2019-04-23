@@ -153,9 +153,6 @@ func (g *Game) InitPlayers() {
 	log.Info("The seating of the players is as follows:")
 	for i, p := range g.Players {
 		str := strconv.Itoa(i+1) + ") " + p.Name
-		if i == 0 {
-			str += " (randomly goes first)"
-		}
 		log.Info(str)
 	}
 	log.Info("----------------------------------------")
@@ -170,6 +167,7 @@ func (g *Game) DealStartingHands() {
 		}
 	}
 	log.Info("----------------------------------------")
+	log.Info(g.Players[g.ActivePlayer].Name + " goes first.")
 }
 
 /*

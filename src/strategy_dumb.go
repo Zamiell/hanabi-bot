@@ -31,6 +31,10 @@ func DumbStart(s *Strategy, g *Game, i int) {
 	d.BlindPlay = true
 }
 
+// DumbActionHappened is called when an action happens
+func DumbActionHappened(s *Strategy, g *Game, a *Action) {
+}
+
 // DumbGetAction is called when it gets to our turn
 // It returns the action that we will perform
 func DumbGetAction(s *Strategy, g *Game) *Action {
@@ -68,10 +72,6 @@ func DumbGetAction(s *Strategy, g *Game) *Action {
 		},
 		Target: target,
 	}
-}
-
-// DumbActionHappened is called when an action happens
-func DumbActionHappened(s *Strategy, g *Game, a *Action) {
 }
 
 // We can attach new functions to the Dumb struct

@@ -10,7 +10,7 @@ import (
 
 const (
 	numPlayers   = 3
-	stratToUse   = "Hypen-ated"
+	stratToUse   = "Hyphen-ated"
 	variantToUse = "No Variant"
 )
 
@@ -40,13 +40,14 @@ func main() {
 
 	// Initialize the game
 	g := &Game{
-		Variant:     variantToUse,
-		Players:     make([]*Player, 0),
-		Stacks:      make([]int, 0),
-		DiscardPile: make([]*Card, 0),
-		Clues:       maxClues,
-		Actions:     make([]*Action, 0),
-		EndTurn:     -1,
+		Variant:       variantToUse,
+		Players:       make([]*Player, 0),
+		PossibleCards: make(map[string]int),
+		Stacks:        make([]int, 0),
+		DiscardPile:   make([]*Card, 0),
+		Clues:         maxClues,
+		Actions:       make([]*Action, 0),
+		EndTurn:       -1,
 	}
 
 	g.InitDeck()
@@ -100,6 +101,8 @@ func main() {
 			} else {
 				log.Info("Players score " + strconv.Itoa(g.Score) + " points.")
 			}
+		} else {
+			log.Info("It is now " + g.Players[g.ActivePlayer].Name + "'s turn.")
 		}
 
 		if g.EndCondition > endConditionInProgress {
