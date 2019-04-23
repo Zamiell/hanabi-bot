@@ -145,11 +145,6 @@ func (g *Game) InitPlayers() {
 		g.Players[i], g.Players[j] = g.Players[j], g.Players[i]
 	}
 
-	// Set the player indexes
-	for i, p := range g.Players {
-		p.Index = i
-	}
-
 	log.Info("The seating of the players is as follows:")
 	for i, p := range g.Players {
 		str := strconv.Itoa(i+1) + ") " + p.Name

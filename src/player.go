@@ -5,7 +5,6 @@ import (
 )
 
 type Player struct {
-	Index    int
 	Name     string
 	Hand     []*Card
 	Notes    []string
