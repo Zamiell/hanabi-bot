@@ -21,13 +21,16 @@ type Hyphenated struct {
 	Cards     []*HyphenCard
 	EarlyGame bool
 }
-type HyphenPlayer struct {
-	Chop int
-}
 type HyphenCard struct {
 	Playable bool
 	Trash    bool
 }
+
+const (
+	hyphenClueTypeSave = iota
+	hyphenClueTypePlay
+	// hyphenClueTypeFix
+)
 
 // HyphenatedStart is called before the first move occurs
 func HyphenatedStart(s *Strategy, g *Game, us int) {
@@ -39,7 +42,9 @@ func HyphenatedStart(s *Strategy, g *Game, us int) {
 	// We need to store additional information about each player
 	d.Players = make([]*HyphenPlayer, 0)
 	for i := 0; i < len(g.Players); i++ {
-		d.Players = append(d.Players, &HyphenPlayer{})
+		d.Players = append(d.Players, &HyphenPlayer{
+			Index: i,
+		})
 	}
 
 	// We need to store additional information about each card
@@ -62,10 +67,11 @@ func HyphenatedActionHappened(s *Strategy, g *Game, a *Action) {
 			}
 		}
 
-		focusedCard := d.FindClueFocus(g, a.Target, a.Clue)
-
-		// Assume that all clues are play clues
-		d.Cards[focusedCard.Order].Playable = true
+		interpretation := d.GetClueInterpretation(g, a)
+		if interpretation == hyphenClueTypePlay {
+			focusedCard := d.GetClueFocus(g, a.Target, a.Clue)
+			d.Cards[focusedCard.Order].Playable = true
+		}
 
 		d.UpdateChop(g, a)
 	}

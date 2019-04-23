@@ -14,6 +14,9 @@ type Card struct {
 	PossibleRanks []int
 	PossibleCards map[string]int
 	Revealed      bool
+	Played        bool
+	Discarded     bool
+	Failed        bool // If the card failed to play
 }
 type CardClue struct {
 	Type     int
@@ -37,6 +40,51 @@ func (c *Card) IsClued() bool {
 
 func (c *Card) IsPlayable(g *Game) bool {
 	return c.Rank == g.Stacks[c.Suit.Index]+1
+}
+
+func (c *Card) CouldBeSuit(s *Suit) bool {
+	for _, suit := range c.PossibleSuits {
+		if s == suit {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Card) CouldBeRank(r int) bool {
+	for _, rank := range c.PossibleRanks {
+		if r == rank {
+			return true
+		}
+	}
+	return false
+}
+
+// NeedsToBePlayed returns true if the card is not yet played
+// and is still needed to be played in order to get the maximum score
+func (c *Card) NeedsToBePlayed(g *Game) bool {
+	// First, check to see if a copy of this card has already been played
+	for _, c2 := range g.Deck {
+		if c2.Suit == c.Suit &&
+			c2.Rank == c.Rank &&
+			c2.Played {
+
+			return false
+		}
+	}
+
+	// Second, check to see if it is still possible to play this card
+	// (the preceding cards in the suit might have already been discarded)
+	for i := 1; i < c.Rank; i++ {
+		total, discarded := g.GetSpecificCardNum(c.Suit, i)
+		if total == discarded {
+			// The suit is "dead", so this card does not need to be played anymore
+			return false
+		}
+	}
+
+	// By default, all cards not yet played will need to be played
+	return true
 }
 
 func (c *Card) RemovePossibility(suit *Suit, rank int, removeAll bool) {

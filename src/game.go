@@ -203,3 +203,20 @@ func (g *Game) GetHandSize() int {
 	log.Fatal("Failed to get the hand size for " + strconv.Itoa(numPlayers) + " players.")
 	return -1
 }
+
+// GetSpecificCardNum returns the total cards in the deck of the specified suit and rank
+// as well as how many of those that have been already discarded
+func (g *Game) GetSpecificCardNum(suit *Suit, rank int) (int, int) {
+	total := 0
+	discarded := 0
+	for _, c := range g.Deck {
+		if c.Suit == suit && c.Rank == rank {
+			total++
+			if c.Discarded {
+				discarded++
+			}
+		}
+	}
+
+	return total, discarded
+}

@@ -89,6 +89,7 @@ func (p *Player) RemoveCard(target int, g *Game) *Card {
 func (p *Player) PlayCard(g *Game, c *Card) {
 	// Find out if this successfully plays
 	if c.IsPlayable(g) {
+		c.Played = true
 		g.Score++
 		g.Stacks[c.Suit.Index] = c.Rank
 
@@ -105,14 +106,19 @@ func (p *Player) PlayCard(g *Game, c *Card) {
 
 		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " plays " + c.Name() + ".")
 	} else {
+		c.Failed = true
+		p.DiscardCard(g, c)
 		g.Strikes++
 		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " fails to plays " + c.Name() + ". The team is now at " + strconv.Itoa(g.Strikes) + " strikes.")
 	}
 }
 
 func (p *Player) DiscardCard(g *Game, c *Card) {
+	c.Discarded = true
 	g.DiscardPile = append(g.DiscardPile, c)
-	log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " discards " + c.Name() + ".")
+	if !c.Failed {
+		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " discards " + c.Name() + ".")
+	}
 }
 
 func (p *Player) DrawCard(g *Game) {

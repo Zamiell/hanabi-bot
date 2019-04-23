@@ -2,7 +2,7 @@ package main
 
 func (d *Hyphenated) Discard(g *Game) *Action {
 	// First, check for known-safe discards (from left-to-right)
-	p := g.Players[g.ActivePlayer]
+	p := g.Players[d.Us]
 	for i := len(p.Hand) - 1; i >= 0; i-- {
 		c := p.Hand[i]
 		if d.Cards[c.Order].Trash {
@@ -13,9 +13,9 @@ func (d *Hyphenated) Discard(g *Game) *Action {
 		}
 	}
 
-	chop := d.Players[g.ActivePlayer].Chop
+	hp := d.Players[d.Us]
 	return &Action{
 		Type:   actionTypeDiscard,
-		Target: p.Hand[chop].Order,
+		Target: hp.GetChop(g).Order,
 	}
 }
