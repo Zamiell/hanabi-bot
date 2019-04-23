@@ -10,12 +10,13 @@ import (
 
 const (
 	numPlayers   = 3
-	stratToUse   = "Dumb"
+	stratToUse   = "Hypen-ated"
 	variantToUse = "No Variant"
 )
 
 var (
-	log *logging.Logger
+	names = []string{"Alice", "Bob", "Cathy", "Donald", "Emily"}
+	log   *logging.Logger
 )
 
 func main() {
@@ -56,8 +57,8 @@ func main() {
 	g.DealStartingHands()
 
 	// Allow the strategies to "see" the opening hands
-	for _, p := range g.Players {
-		p.Strategy.Start(p.Strategy)
+	for i, p := range g.Players {
+		p.Strategy.Start(p.Strategy, g, i)
 	}
 
 	// Play the game until it ends
@@ -81,7 +82,13 @@ func main() {
 				"\"" + strconv.Itoa(a.Type) + "\".")
 			return
 		}
+
 		g.Actions = append(g.Actions, a)
+
+		// Allow the strategies to "see" the new action
+		for _, p := range g.Players {
+			p.Strategy.ActionHappened(p.Strategy, g, a)
+		}
 
 		// Increment the turn
 		g.Turn++

@@ -6,9 +6,9 @@ var (
 
 type Strategy struct {
 	Name           string
-	Start          func(*Strategy)
+	Start          func(*Strategy, *Game, int)
 	GetAction      func(*Strategy, *Game) *Action
-	ActionHappened func(*Strategy, *Game)
+	ActionHappened func(*Strategy, *Game, *Action)
 	Data           interface{}
 }
 

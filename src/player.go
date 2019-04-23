@@ -13,10 +13,13 @@ type Player struct {
 }
 
 func (p *Player) GiveClue(a *Action, g *Game) {
-	// Apply the positive and negative clues
+	// Keep track that someone clued (i.e. doing 1 clue costs 1 "Clue Token")
+	g.Clues--
+
+	// Apply the positive and negative clues to the cards in the hand
 	for _, c := range p.Hand {
 		positive := false
-		if variantIsCardTouched(g.Variant, a.Clue, c) {
+		if variantIsCardTouched(g, a.Clue, c) {
 			positive = true
 		}
 		c.Clues = append(c.Clues, &CardClue{
@@ -24,10 +27,35 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 			Value:    a.Clue.Value,
 			Positive: positive,
 		})
-	}
 
-	// Keep track that someone clued (i.e. doing 1 clue costs 1 "Clue Token")
-	g.Clues--
+		if a.Clue.Type == clueTypeRank {
+			clueRank := a.Clue.Value
+			for i := len(c.PossibleRanks) - 1; i >= 0; i-- {
+				rank := c.PossibleRanks[i]
+				if !(rank == clueRank == positive) {
+					c.PossibleRanks = append(c.PossibleRanks[:i], c.PossibleRanks[i+1:]...)
+
+					for _, suit := range variants[g.Variant].Suits {
+						c.RemovePossibility(suit, rank, true)
+					}
+				}
+			}
+		} else if a.Clue.Type == clueTypeColor {
+			clueSuit := variants[g.Variant].Suits[a.Clue.Value]
+			for i := len(c.PossibleRanks) - 1; i >= 0; i-- {
+				suit := c.PossibleSuits[i]
+				if !(suit == clueSuit == positive) {
+					c.PossibleSuits = append(c.PossibleSuits[:i], c.PossibleSuits[i+1:]...)
+
+					for _, rank := range variants[g.Variant].Ranks {
+						c.RemovePossibility(suit, rank, true)
+					}
+				}
+			}
+		}
+
+		// Remove the card possibilities from the card
+	}
 
 	p2 := g.Players[a.Target]
 	str := "Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " tells " + p2.Name + " about "
@@ -53,9 +81,9 @@ func (p *Player) RemoveCard(target int, g *Game) *Card {
 
 func (p *Player) PlayCard(g *Game, c *Card) {
 	// Find out if this successfully plays
-	if c.Rank == g.Stacks[c.Suit]+1 {
+	if c.Rank == g.Stacks[c.Suit.GetInteger(g)]+1 {
 		g.Score++
-		g.Stacks[c.Suit] = c.Rank
+		g.Stacks[c.Suit.GetInteger(g)] = c.Rank
 
 		// Give the team a clue if the final card of the suit was played
 		if c.Rank == 5 {

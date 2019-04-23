@@ -62,7 +62,7 @@ func actionClue(g *Game, p *Player, a *Action) {
 	touchedAtLeastOneCard := false
 	p2 := g.Players[a.Target]
 	for _, c := range p2.Hand {
-		if variantIsCardTouched(g.Variant, a.Clue, c) {
+		if variantIsCardTouched(g, a.Clue, c) {
 			touchedAtLeastOneCard = true
 			break
 		}

@@ -6,22 +6,23 @@ import (
 )
 
 type Game struct {
-	Variant      string
-	Players      []*Player
-	Seed         int
-	Deck         []*Card
-	DeckIndex    int
-	Stacks       []int
-	DiscardPile  []*Card
-	Turn         int
-	FirstPlayer  int
-	ActivePlayer int
-	Clues        int
-	Score        int
-	Strikes      int
-	Actions      []*Action
-	EndCondition int
-	EndTurn      int
+	Variant       string
+	Players       []*Player
+	Seed          int
+	Deck          []*Card
+	PossibleCards map[string]int
+	DeckIndex     int
+	Stacks        []int
+	DiscardPile   []*Card
+	Turn          int
+	FirstPlayer   int
+	ActivePlayer  int
+	Clues         int
+	Score         int
+	Strikes       int
+	Actions       []*Action
+	EndCondition  int
+	EndTurn       int
 }
 
 type Action struct {
@@ -41,13 +42,8 @@ type Clue struct {
 
 func (g *Game) InitDeck() {
 	// Create the deck
-	suits := make([]int, 0)
-	for i := 0; i < 5; i++ {
-		suits = append(suits, i) // For a normal game, the suits will be equal to {0, 1, 2, 3, 4}
-	}
-	for _, suit := range suits {
-		ranks := []int{1, 2, 3, 4, 5}
-		for _, rank := range ranks {
+	for _, suit := range variants[g.Variant].Suits {
+		for _, rank := range variants[g.Variant].Ranks {
 			// In a normal suit of Hanabi,
 			// there are three 1's, two 2's, two 3's, two 4's, and one five
 			var amountToAdd int
@@ -61,12 +57,29 @@ func (g *Game) InitDeck() {
 
 			for i := 0; i < amountToAdd; i++ {
 				// Add the card to the deck
-				g.Deck = append(g.Deck, &Card{
+				c := &Card{
 					Suit: suit,
 					Rank: rank,
 					// We can't set the order here because the deck will be shuffled later
-				})
+					Clues:         make([]*CardClue, 0),
+					PossibleSuits: variants[g.Variant].Suits,
+					PossibleRanks: variants[g.Variant].Ranks,
+					PossibleCards: make(map[string]int),
+				}
+
+				g.Deck = append(g.Deck, c)
+
+				// Add the possibility
+				mapIndex := suit.Name + strconv.Itoa(rank)
+				g.PossibleCards[mapIndex]++
 			}
+		}
+	}
+
+	// Copy all of the possibilities into every card
+	for _, c := range g.Deck {
+		for k, v := range g.PossibleCards {
+			c.PossibleCards[k] = v
 		}
 	}
 }
@@ -104,7 +117,6 @@ func (g *Game) Shuffle() {
 }
 
 func (g *Game) InitPlayers() {
-	names := []string{"Alice", "Bob", "Cathy", "Donald", "Emily"}
 	for i := 0; i < numPlayers; i++ {
 		notes := make([]string, 0)
 		for j := 0; j < len(g.Deck); j++ {

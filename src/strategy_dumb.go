@@ -16,12 +16,16 @@ func NewDumb() *Strategy {
 }
 
 type Dumb struct {
+	OurIndex  int
 	BlindPlay bool // True if the player will blind-play on the next turn
 }
 
 // DumbStart is called before the first move occurs
-func DumbStart(s *Strategy) {
+func DumbStart(s *Strategy, g *Game, i int) {
 	d := s.Data.(*Dumb)
+
+	// Store which player we are
+	d.OurIndex = i
 
 	// We don't want to blind-play on the first turn
 	d.BlindPlay = true
@@ -67,7 +71,7 @@ func DumbGetAction(s *Strategy, g *Game) *Action {
 }
 
 // DumbActionHappened is called when an action happens
-func DumbActionHappened(s *Strategy, g *Game) {
+func DumbActionHappened(s *Strategy, g *Game, a *Action) {
 }
 
 // We can attach new functions to the Dumb struct
