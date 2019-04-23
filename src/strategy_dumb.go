@@ -44,7 +44,7 @@ func DumbGetAction(s *Strategy, g *Game) *Action {
 	d.InvertDumbness()
 
 	if d.BlindPlay && g.Clues > 0 {
-		// Get the our slot 1 card
+		// Get our slot 1 card
 		p := g.Players[d.Us]
 		firstCard := p.GetSlot(1)
 
@@ -60,7 +60,7 @@ func DumbGetAction(s *Strategy, g *Game) *Action {
 		target = 0
 	}
 
-	// Get their slot 1
+	// Get their slot 1 card
 	p := g.Players[target]
 	firstCard := p.GetSlot(1)
 
