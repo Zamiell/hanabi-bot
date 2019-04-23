@@ -12,6 +12,10 @@ type Player struct {
 	Strategy *Strategy
 }
 
+/*
+	Main functions
+*/
+
 func (p *Player) GiveClue(a *Action, g *Game) {
 	// Keep track that someone clued (i.e. doing 1 clue costs 1 "Clue Token")
 	g.Clues--
@@ -136,6 +140,16 @@ func (p *Player) DrawCard(g *Game) {
 	Subroutines
 */
 
+func (p *Player) InHand(order int) bool {
+	for _, c := range p.Hand {
+		if c.Order == order {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (p *Player) GetCardIndex(order int) int {
 	for i, c := range p.Hand {
 		if c.Order == order {
@@ -146,14 +160,13 @@ func (p *Player) GetCardIndex(order int) int {
 	return -1
 }
 
-func (p *Player) InHand(order int) bool {
-	for _, c := range p.Hand {
-		if c.Order == order {
-			return true
-		}
+func (p *Player) GetSlot(slot int) *Card {
+	// Slot 1 is the newest (left-most) card, which is at index 4 (in a 3 player game)
+	i := len(p.Hand) - slot
+	if i < 0 || i > len(p.Hand)-1 {
+		return nil
 	}
-
-	return false
+	return p.Hand[i]
 }
 
 func (p *Player) GetCardsTouchedByClue(g *Game, clue *Clue) []*Card {

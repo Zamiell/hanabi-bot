@@ -16,16 +16,16 @@ func NewDumb() *Strategy {
 }
 
 type Dumb struct {
-	OurIndex  int
+	Us        int  // Our player index
 	BlindPlay bool // True if the player will blind-play on the next turn
 }
 
 // DumbStart is called before the first move occurs
-func DumbStart(s *Strategy, g *Game, i int) {
+func DumbStart(s *Strategy, g *Game, us int) {
 	d := s.Data.(*Dumb)
 
 	// Store which player we are
-	d.OurIndex = i
+	d.Us = us
 
 	// We don't want to blind-play on the first turn
 	d.BlindPlay = true
@@ -45,8 +45,8 @@ func DumbGetAction(s *Strategy, g *Game) *Action {
 
 	if d.BlindPlay && g.Clues > 0 {
 		// Get the our slot 1 card
-		hand := g.Players[g.ActivePlayer].Hand
-		firstCard := hand[len(hand)-1]
+		p := g.Players[d.Us]
+		firstCard := p.GetSlot(1)
 
 		return &Action{
 			Type:   actionTypePlay,
@@ -61,8 +61,8 @@ func DumbGetAction(s *Strategy, g *Game) *Action {
 	}
 
 	// Get their slot 1
-	hand := g.Players[target].Hand
-	firstCard := hand[len(hand)-1]
+	p := g.Players[target]
+	firstCard := p.GetSlot(1)
 
 	return &Action{
 		Type: actionTypeClue,
