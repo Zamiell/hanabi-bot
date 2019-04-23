@@ -14,6 +14,7 @@ type Game struct {
 	Stacks       []int
 	DiscardPile  []*Card
 	Turn         int
+	FirstPlayer  int
 	ActivePlayer int
 	Clues        int
 	Score        int
@@ -24,14 +25,14 @@ type Game struct {
 }
 
 type Action struct {
-	Type   int // 0 is clue, 1 is play, 2 is discard
-	Clue   *Clue
-	Target int
+	Type   int   `json:"type"` // 0 is clue, 1 is play, 2 is discard
+	Clue   *Clue `json:"clue"`
+	Target int   `json:"target"`
 }
 
 type Clue struct {
-	Type  int // 0 is a rank clue, 1 if a clue color
-	Value int
+	Type  int `json:"type"` // 0 is a rank clue, 1 if a clue color
+	Value int `json:"value"`
 }
 
 /*
@@ -102,9 +103,26 @@ func (g *Game) Shuffle() {
 	*/
 }
 
-func (g *Game) InitStartingPlayer() {
+func (g *Game) InitPlayers() {
+	names := []string{"Alice", "Bob", "Cathy", "Donald", "Emily"}
+	for i := 0; i < numPlayers; i++ {
+		notes := make([]string, 0)
+		for j := 0; j < len(g.Deck); j++ {
+			notes = append(notes, "")
+		}
+
+		p := &Player{
+			Name:     names[i],
+			Hand:     make([]*Card, 0),
+			Notes:    notes,
+			Strategy: strategies[stratToUse](),
+		}
+		g.Players = append(g.Players, p)
+	}
+
 	// Get a random player to start first (based on the game seed)
-	g.ActivePlayer = rand.Intn(len(g.Players))
+	g.FirstPlayer = rand.Intn(len(g.Players))
+	g.ActivePlayer = g.FirstPlayer
 
 	// Shuffle the order of the players
 	// (otherwise, the seat order would always correspond to the order that
