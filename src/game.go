@@ -86,7 +86,7 @@ func (g *Game) InitDeck() {
 
 func (g *Game) InitStacks() {
 	g.Stacks = make([]int, 0)
-	for i := 0; i < 5; i++ {
+	for i := 0; i < len(variants[g.Variant].Suits); i++ {
 		g.Stacks = append(g.Stacks, 0)
 	}
 }

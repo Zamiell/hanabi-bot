@@ -110,5 +110,6 @@ func main() {
 		}
 	}
 
+	// Provide a JSON export of the game that can be imported into Hanabi Live
 	g.Export()
 }
