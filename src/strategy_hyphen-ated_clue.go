@@ -106,7 +106,7 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 			}
 		}
 		// Color clues
-		for j, k := range variants[g.Variant].ClueColors {
+		for j, _ := range variants[g.Variant].ClueColors {
 			clue := d.CheckViableClue(g, i, clueTypeColor, j)
 			if clue != nil {
 				viableClues = append(viableClues, clue)
