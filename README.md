@@ -14,6 +14,8 @@ Copy the "strategy_dumb.go" file and rename it to "strategy_whatever.go". Fill i
 
 * The project doesn't require any special dependencies. Just clone the repo and go.
 
+<br />
+
 ### Installation (for noobs)
 
 Like many code projects, we use [golangci-lint](https://github.com/golangci/golangci-lint) to ensure that all of the code is written consistently and error-free. We ask that all pull requests pass our linting rules.
