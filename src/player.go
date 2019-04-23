@@ -87,7 +87,7 @@ func (p *Player) PlayCard(g *Game, c *Card) {
 	// Find out if this successfully plays
 	if c.IsPlayable(g) {
 		g.Score++
-		g.Stacks[c.Suit.GetInteger(g)] = c.Rank
+		g.Stacks[c.Suit.Index] = c.Rank
 
 		// Give the team a clue if the final card of the suit was played
 		if c.Rank == 5 {

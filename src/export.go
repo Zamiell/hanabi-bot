@@ -26,7 +26,7 @@ func (g *Game) Export() {
 	deck := make([]JSONCard, 0)
 	for _, c := range g.Deck {
 		deck = append(deck, JSONCard{
-			Suit: c.Suit.GetInteger(g),
+			Suit: c.Suit.Index,
 			Rank: c.Rank,
 		})
 	}

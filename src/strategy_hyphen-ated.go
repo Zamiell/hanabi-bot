@@ -99,10 +99,14 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 		return a
 	}
 
-	a = d.Discard(g)
-	if a != nil {
-		return a
+	if g.Clues != 8 {
+		a = d.Discard(g)
+		if a != nil {
+			return a
+		}
 	}
+
+	// TODO give a stall clue
 
 	return nil
 }

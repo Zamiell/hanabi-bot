@@ -36,7 +36,7 @@ func (c *Card) IsClued() bool {
 }
 
 func (c *Card) IsPlayable(g *Game) bool {
-	return c.Rank == g.Stacks[c.Suit.GetInteger(g)]+1
+	return c.Rank == g.Stacks[c.Suit.Index]+1
 }
 
 func (c *Card) RemovePossibility(suit *Suit, rank int, removeAll bool) {

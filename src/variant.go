@@ -9,20 +9,9 @@ type Variant struct {
 
 type Suit struct {
 	Name       string
+	Index      int
 	ClueColors []string
 	OneOfEach  bool
-}
-
-func (s *Suit) GetInteger(g *Game) int {
-	log.Debug("-----")
-	for i, suit := range variants[g.Variant].Suits {
-		log.Debug(suit.Name, s.Name)
-		if suit.Name == s.Name {
-			return i
-		}
-	}
-
-	return -1
 }
 
 var (
@@ -34,9 +23,10 @@ func variantsInit() {
 
 	suits := make([]*Suit, 0)
 	colors := []string{"Blue", "Green", "Yellow", "Red", "Purple"}
-	for _, color := range colors {
+	for i, color := range colors {
 		suits = append(suits, &Suit{
 			Name:       color,
+			Index:      i,
 			ClueColors: []string{color},
 		})
 	}
@@ -56,7 +46,7 @@ func variantIsCardTouched(g *Game, clue *Clue, card *Card) bool {
 		return card.Rank == clue.Value
 	} else if clue.Type == clueTypeColor {
 		color := variants[g.Variant].ClueColors[clue.Value]
-		colors := variants[g.Variant].Suits[card.Suit.GetInteger(g)].ClueColors
+		colors := variants[g.Variant].Suits[card.Suit.Index].ClueColors
 		return stringInSlice(color, colors)
 	}
 

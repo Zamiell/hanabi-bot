@@ -83,7 +83,7 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 				}
 			} else if j == clueTypeColor {
 				for _, k := range variants[g.Variant].Suits {
-					clue := d.CheckViableClue(g, i, j, k.GetInteger(g))
+					clue := d.CheckViableClue(g, i, j, k.Index)
 					if clue != nil {
 						viableClues = append(viableClues, clue)
 					}
