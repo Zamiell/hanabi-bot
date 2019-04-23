@@ -73,7 +73,8 @@ func HyphenatedActionHappened(s *Strategy, g *Game, a *Action) {
 			d.Cards[focusedCard.Order].Playable = true
 		}
 
-		d.UpdateChop(g, a)
+		hp := d.Players[a.Target]
+		hp.UpdateChop(g)
 	}
 }
 

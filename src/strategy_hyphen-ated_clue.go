@@ -67,25 +67,6 @@ func (d *Hyphenated) GetClueInterpretation(g *Game, a *Action) int {
 	return hyphenClueTypePlay
 }
 
-func (d *Hyphenated) UpdateChop(g *Game, a *Action) {
-	p := g.Players[a.Target]
-	for i, c := range p.Hand {
-		hasPositiveClue := false
-		for _, clue := range c.Clues {
-			if clue.Positive {
-				hasPositiveClue = true
-				break
-			}
-		}
-		if !hasPositiveClue {
-			d.Players[a.Target].Chop = i
-		}
-	}
-
-	// The hand is fully-clued, so just make the chop the left-most card
-	d.Players[a.Target].Chop = len(p.Hand) - 1
-}
-
 type PossibleClue struct {
 	Clue       *Clue
 	Target     int
