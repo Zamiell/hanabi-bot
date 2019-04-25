@@ -24,6 +24,19 @@ type CardClue struct {
 	Positive bool
 }
 
+func (c *CardClue) Name(g *Game) string {
+	name := ""
+	if c.Type == 0 {
+		name = string(c.Value)
+	} else {
+		name = variants[g.Variant].ClueColors[c.Value]
+	}
+	if !c.Positive {
+		name = "-" + name
+	}
+	return name
+}
+
 func (c *Card) Name() string {
 	name := c.Suit.Name + " " + strconv.Itoa(c.Rank)
 	return name

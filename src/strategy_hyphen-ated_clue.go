@@ -87,7 +87,7 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 			}
 		}
 		// Color clues
-		for j, _ := range variants[g.Variant].ClueColors {
+		for j := range variants[g.Variant].ClueColors {
 			clue := d.CheckViableClue(g, i, clueTypeColor, j)
 			if clue != nil {
 				viableClues = append(viableClues, clue)
@@ -140,7 +140,7 @@ func (d *Hyphenated) CheckViableClue(g *Game, i int, j int, k int) *PossibleClue
 
 	// Check to see if the card would misplay if we clued it
 	c := d.GetClueFocus(g, i, clue)
-	if !c.IsPlayable(g) {
+	if c == nil || !c.IsPlayable(g) {
 		return nil
 	}
 

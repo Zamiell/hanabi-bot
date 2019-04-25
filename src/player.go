@@ -18,9 +18,9 @@ type Player struct {
 func (p *Player) GiveClue(a *Action, g *Game) {
 	// Keep track that someone clued (i.e. doing 1 clue costs 1 "Clue Token")
 	g.Clues--
-
+	p2 := g.Players[a.Target]
 	// Apply the positive and negative clues to the cards in the hand
-	for _, c := range p.Hand {
+	for _, c := range p2.Hand {
 		positive := false
 		if variantIsCardTouched(g, a.Clue, c) {
 			positive = true
@@ -46,7 +46,7 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 			}
 		} else if a.Clue.Type == clueTypeColor {
 			clueSuit := variants[g.Variant].Suits[a.Clue.Value]
-			for i := len(c.PossibleRanks) - 1; i >= 0; i-- {
+			for i := len(c.PossibleSuits) - 1; i >= 0; i-- {
 				suit := c.PossibleSuits[i]
 				if !(suit == clueSuit == positive) {
 					c.PossibleSuits = append(c.PossibleSuits[:i], c.PossibleSuits[i+1:]...)
@@ -63,7 +63,6 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 		}
 	}
 
-	p2 := g.Players[a.Target]
 	str := "Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " tells " + p2.Name + " about "
 	if a.Clue.Type == clueTypeRank {
 		str += "rank " + strconv.Itoa(a.Clue.Value)
