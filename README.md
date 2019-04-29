@@ -59,3 +59,6 @@ Note that these steps require **an elevated (administrator) command-shell**.
   * On the left pane, navigate to and open "src\action.go".
   * In the bottom-right-hand corner, click on "Analysis Tools Missing" and then on "Install". You will know that it has finished once it displays: "All tools successfully installed."
   * Add a new line of "asdf" somewhere, save the file, and watch as some "Problems" appear in the bottom pane.
+* Run the code:
+  * `./run.sh` <br />
+  (by default, it uses the Hyphen-ated strategy with 3 players; edit "main.go" to adjust this)
