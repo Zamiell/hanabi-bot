@@ -1,5 +1,6 @@
 package main
 
+// We store extra information about each player
 type HyphenPlayer struct {
 	Index int
 	Chop  int // Equal to the index in the hand of the chop card

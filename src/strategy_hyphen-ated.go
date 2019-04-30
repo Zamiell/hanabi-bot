@@ -21,6 +21,8 @@ type Hyphenated struct {
 	Cards     []*HyphenCard
 	EarlyGame bool
 }
+
+// We store extra information about each card
 type HyphenCard struct {
 	Playable bool
 	Trash    bool
