@@ -31,7 +31,7 @@ func DumbStart(s *Strategy, g *Game, us int) {
 	d.BlindPlay = true
 }
 
-// DumbActionHappened is called when an action happens
+// DumbActionHappened is called when a player clues, plays, or discards
 func DumbActionHappened(s *Strategy, g *Game, a *Action) {
 }
 
