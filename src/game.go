@@ -25,17 +25,6 @@ type Game struct {
 	EndTurn       int
 }
 
-type Action struct {
-	Type   int   `json:"type"` // 0 is clue, 1 is play, 2 is discard
-	Clue   *Clue `json:"clue"`
-	Target int   `json:"target"`
-}
-
-type Clue struct {
-	Type  int `json:"type"` // 0 is a rank clue, 1 if a clue color
-	Value int `json:"value"`
-}
-
 /*
 	Initialization functions
 */
@@ -143,6 +132,11 @@ func (g *Game) InitPlayers() {
 	for i := range g.Players {
 		j := rand.Intn(i + 1)
 		g.Players[i], g.Players[j] = g.Players[j], g.Players[i]
+	}
+
+	// Store the player indexes for later
+	for i, p := range g.Players {
+		p.Index = i
 	}
 
 	log.Info("The seating of the players is as follows:")

@@ -55,6 +55,15 @@ func (c *Card) IsPlayable(g *Game) bool {
 	return c.Rank == g.Stacks[c.Suit.Index]+1
 }
 
+func (c *Card) IsCritical(g *Game) bool {
+	if c.Played || c.Discarded {
+		return false
+	}
+
+	total, discarded := g.GetSpecificCardNum(c.Suit, c.Rank)
+	return total == discarded+1
+}
+
 func (c *Card) CouldBeSuit(s *Suit) bool {
 	for _, suit := range c.PossibleSuits {
 		if s == suit {

@@ -174,3 +174,24 @@ func (d *Hyphenated) CheckViableClue(g *Game, i int, j int, k int) *PossibleClue
 		CardsClued: len(freshCards),
 	}
 }
+
+func (d *Hyphenated) CheckNextPlayerChop(g *Game) *Action {
+	p := g.Players[d.Us]
+	npi := p.GetNextPlayerIndex(g)
+	hnp := d.Players[npi]
+	c := hnp.GetChop(g)
+	// TODO account for chop moves
+	// TODO account for 2 saves
+	if c.IsCritical(g) && len(c.Clues) == 0 {
+		// We need to save the next guy's chop
+		return &Action{
+			Type: actionTypeClue,
+			Clue: &Clue{
+				Type:  0,
+				Value: c.Rank,
+			},
+			Target: npi,
+		}
+	}
+	return nil
+}

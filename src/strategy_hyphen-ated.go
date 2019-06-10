@@ -5,6 +5,8 @@
 
 package main
 
+import "strconv"
+
 func NewHyphenated() *Strategy {
 	return &Strategy{
 		Name:           "Hyphen-ated",
@@ -49,7 +51,7 @@ func HyphenatedStart(s *Strategy, g *Game, us int) {
 		})
 	}
 
-	// Initialize the objects that will store additional information about each each
+	// Initialize the objects that will store additional information about each card
 	d.Cards = make([]*HyphenCard, 0)
 	for i := 0; i < len(g.Deck); i++ {
 		d.Cards = append(d.Cards, &HyphenCard{})
@@ -60,6 +62,8 @@ func HyphenatedStart(s *Strategy, g *Game, us int) {
 func HyphenatedActionHappened(s *Strategy, g *Game, a *Action) {
 	if a.Type == actionTypeClue {
 		HyphenatedActionHappenedClue(s, g, a)
+	} else if a.Type == actionTypePlay {
+	} else if a.Type == actionTypeDiscard {
 	}
 }
 
@@ -103,37 +107,50 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 	d := s.Data.(*Hyphenated)
 	var a *Action
 
+	n := 0
 	if g.Clues > 0 {
 		// Check for the next guy's chop
-		// TODO
+		a = d.CheckNextPlayerChop(g)
+		n++
+		if a != nil {
+			log.Info("Using logic " + strconv.Itoa(n) + ": CheckNextPlayerChop")
+			return a
+		}
 
 		// If we have playable cards, play them
-		a = d.CheckPlayable(g)
+		a = d.CheckPlayableCards(g)
+		n++
 		if a != nil {
+			log.Info("Using logic " + strconv.Itoa(n) + ": CheckPlayableCards")
 			return a
 		}
 
 		// Clue playable cards
 		a = d.CheckPlayClues(g)
+		n++
 		if a != nil {
+			log.Info("Using logic " + strconv.Itoa(n) + ": CheckPlayClues")
 			return a
 		}
 	}
 
 	// If we have playable cards, play them
-	a = d.CheckPlayable(g)
+	a = d.CheckPlayableCards(g)
+	n++
 	if a != nil {
+		log.Info("Using logic " + strconv.Itoa(n) + ": CheckPlayableCards")
 		return a
 	}
 
 	if g.Clues != 8 {
 		a = d.Discard(g)
+		n++
 		if a != nil {
+			log.Info("Using logic " + strconv.Itoa(n) + ": Discard")
 			return a
 		}
 	}
 
 	// TODO give a stall clue
-
 	return nil
 }

@@ -1,6 +1,6 @@
 package main
 
-func (d *Hyphenated) CheckPlayable(g *Game) *Action {
+func (d *Hyphenated) CheckPlayableCards(g *Game) *Action {
 	// Look through our whole hand and make a list of all the playable cards
 	p := g.Players[d.Us]
 	playables := make([]*Card, 0)

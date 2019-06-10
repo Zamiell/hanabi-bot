@@ -5,6 +5,7 @@ import (
 )
 
 type Player struct {
+	Index    int
 	Name     string
 	Hand     []*Card
 	Notes    []string
@@ -16,13 +17,16 @@ type Player struct {
 */
 
 func (p *Player) GiveClue(a *Action, g *Game) {
-	// Keep track that someone clued (i.e. doing 1 clue costs 1 "Clue Token")
+	// Keep track that someone clued (performing a clue costs one "Clue Token")
 	g.Clues--
-	p2 := g.Players[a.Target]
+
 	// Apply the positive and negative clues to the cards in the hand
+	p2 := g.Players[a.Target]
+	cardsTouched := 0
 	for _, c := range p2.Hand {
 		positive := false
 		if variantIsCardTouched(g, a.Clue, c) {
+			cardsTouched++
 			positive = true
 		}
 		c.Clues = append(c.Clues, &CardClue{
@@ -63,15 +67,28 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 		}
 	}
 
-	str := "Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " tells " + p2.Name + " about "
-	if a.Clue.Type == clueTypeRank {
-		str += "rank " + strconv.Itoa(a.Clue.Value)
-	} else if a.Clue.Type == clueTypeColor {
-		color := variants[g.Variant].ClueColors[a.Clue.Value]
-		str += "color " + color
+	// Log the clue
+	text := "Turn " + strconv.Itoa(g.Turn+1) + " - "
+	text += p.Name + " tells " + p2.Name + " about "
+	words := []string{
+		"zero",
+		"one",
+		"two",
+		"three",
+		"four",
+		"five",
 	}
-	log.Info(str)
-	log.Info("There are now " + strconv.Itoa(g.Clues) + " clues left.")
+	text += words[cardsTouched] + " "
+	if a.Clue.Type == clueTypeRank {
+		text += strconv.Itoa(a.Clue.Value)
+	} else if a.Clue.Type == clueTypeColor {
+		text += variants[g.Variant].ClueColors[a.Clue.Value]
+	}
+	if cardsTouched != 1 {
+		text += "s"
+	}
+	text += ". (There are now " + strconv.Itoa(g.Clues) + " clues left.)"
+	log.Info(text)
 }
 
 func (p *Player) RemoveCard(target int, g *Game) *Card {
@@ -108,7 +125,7 @@ func (p *Player) PlayCard(g *Game, c *Card) {
 		c.Failed = true
 		p.DiscardCard(g, c)
 		g.Strikes++
-		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " fails to plays " + c.Name() + ". The team is now at " + strconv.Itoa(g.Strikes) + " strikes.")
+		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " fails to plays " + c.Name() + ". (The team is now at " + strconv.Itoa(g.Strikes) + " strikes.)")
 	}
 }
 
@@ -137,7 +154,7 @@ func (p *Player) DrawCard(g *Game) {
 		g.EndTurn = g.Turn + len(g.Players) + 1
 	}
 
-	log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " draws a " + c.Name())
+	log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " draws a " + c.Name() + ".")
 }
 
 /*
@@ -194,4 +211,14 @@ func (p *Player) GetFreshCardsTouchedByClue(g *Game, clue *Clue) []*Card {
 		}
 	}
 	return freshCards
+}
+
+func (p *Player) GetNextPlayerIndex(g *Game) int {
+	return (p.Index + 1) % len(g.Players)
+}
+
+func (p *Player) GetPreviousPlayerIndex(g *Game) int {
+	// In Golang, "%" will give the remainder and not the modulus,
+	// so we need to ensure that the result is not negative or we will get a "index out of range" error
+	return (p.Index - 1 + len(g.Players)) % len(g.Players)
 }

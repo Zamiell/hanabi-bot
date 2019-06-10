@@ -4,6 +4,19 @@ import (
 	"strconv"
 )
 
+type Action struct {
+	Type int   `json:"type"` // 0 is clue, 1 is play, 2 is discard
+	Clue *Clue `json:"clue"`
+	// If a clue, matches the index of the player
+	// If a play/discard, matches the order of the card
+	Target int `json:"target"`
+}
+
+type Clue struct {
+	Type  int `json:"type"` // 0 is a rank clue, 1 if a clue color
+	Value int `json:"value"`
+}
+
 func actionClue(g *Game, p *Player, a *Action) {
 	// Validate that the target of the clue is sane
 	if a.Target < 0 || a.Target > len(g.Players)-1 {
