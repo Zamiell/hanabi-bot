@@ -151,6 +151,23 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 		}
 	}
 
-	// TODO give a stall clue
+	if g.Clues > 0 {
+		// Give a 5 Stall clue
+		a = d.Check5Stall(g)
+		n++
+		if a != nil {
+			log.Info("Using logic " + strconv.Itoa(n) + ": Check5Stall")
+			return a
+		}
+
+		// Give a "hard burn" (e.g. a stall clue)
+		a = d.Check5Burn(g)
+		n++
+		if a != nil {
+			log.Info("Using logic " + strconv.Itoa(n) + ": Check5Burn")
+			return a
+		}
+	}
+
 	return nil
 }

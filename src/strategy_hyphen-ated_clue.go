@@ -79,6 +79,7 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 		if i == d.Us {
 			continue
 		}
+
 		// Rank clues
 		for _, k := range variants[g.Variant].ClueRanks {
 			clue := d.CheckViableClue(g, i, clueTypeRank, k)
@@ -86,6 +87,7 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 				viableClues = append(viableClues, clue)
 			}
 		}
+
 		// Color clues
 		for j := range variants[g.Variant].ClueColors {
 			clue := d.CheckViableClue(g, i, clueTypeColor, j)
@@ -187,11 +189,57 @@ func (d *Hyphenated) CheckNextPlayerChop(g *Game) *Action {
 		return &Action{
 			Type: actionTypeClue,
 			Clue: &Clue{
-				Type:  0,
+				Type:  clueTypeRank,
 				Value: c.Rank,
 			},
 			Target: npi,
 		}
 	}
+	return nil
+}
+
+func (d *Hyphenated) Check5Stall(g *Game) *Action {
+	for i, p := range g.Players {
+		if i == d.Us {
+			continue
+		}
+
+		for _, c := range p.Hand {
+			if c.Rank == 5 && len(c.Clues) == 0 {
+				return &Action{
+					Type: actionTypeClue,
+					Clue: &Clue{
+						Type:  clueTypeRank,
+						Value: c.Rank,
+					},
+					Target: p.Index,
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func (d *Hyphenated) Check5Burn(g *Game) *Action {
+	for i, p := range g.Players {
+		if i == d.Us {
+			continue
+		}
+
+		for _, c := range p.Hand {
+			if c.Rank == 5 {
+				return &Action{
+					Type: actionTypeClue,
+					Clue: &Clue{
+						Type:  clueTypeRank,
+						Value: c.Rank,
+					},
+					Target: p.Index,
+				}
+			}
+		}
+	}
+
 	return nil
 }
