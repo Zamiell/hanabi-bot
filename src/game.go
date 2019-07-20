@@ -50,9 +50,11 @@ func (g *Game) InitDeck() {
 					Suit: suit,
 					Rank: rank,
 					// We can't set the order here because the deck will be shuffled later
+					Holder:        -1,
+					Slot:          -1,
 					Clues:         make([]*CardClue, 0),
-					PossibleSuits: variants[g.Variant].Suits,
-					PossibleRanks: variants[g.Variant].Ranks,
+					PossibleSuits: append(variants[g.Variant].Suits[:0:0], variants[g.Variant].Suits...),
+					PossibleRanks: append(variants[g.Variant].Ranks[:0:0], variants[g.Variant].Ranks...),
 					PossibleCards: make(map[string]int),
 				}
 

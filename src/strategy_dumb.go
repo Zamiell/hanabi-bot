@@ -7,11 +7,12 @@ package main
 
 func NewDumb() *Strategy {
 	return &Strategy{
-		Name:           "Dumb",
-		Start:          DumbStart,
-		GetAction:      DumbGetAction,
-		ActionHappened: DumbActionHappened,
-		Data:           &Dumb{},
+		Name:            "Dumb",
+		Start:           DumbStart,
+		GetAction:       DumbGetAction,
+		ActionAnnounced: DumbActionAnnounced,
+		ActionHappened:  DumbActionHappened,
+		Data:            &Dumb{},
 	}
 }
 
@@ -31,7 +32,11 @@ func DumbStart(s *Strategy, g *Game, us int) {
 	d.BlindPlay = true
 }
 
-// DumbActionHappened is called when a player clues, plays, or discards
+// DumbActionAnnounced is called before a player clues, plays, or discards
+func DumbActionAnnounced(s *Strategy, g *Game, a *Action) {
+}
+
+// DumbActionHappened is called after a player clues, plays, or discards
 func DumbActionHappened(s *Strategy, g *Game, a *Action) {
 }
 

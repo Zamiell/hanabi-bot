@@ -71,6 +71,11 @@ func main() {
 			log.Fatal("The strategy of \"" + p.Strategy.Name + "\" returned a nil action.")
 		}
 
+		// Allow the strategies to "see" the upcoming action
+		for _, p := range g.Players {
+			p.Strategy.ActionAnnounced(p.Strategy, g, a)
+		}
+
 		// Perform the move
 		if a.Type == actionTypeClue {
 			actionClue(g, p, a)
@@ -83,10 +88,9 @@ func main() {
 				"\"" + strconv.Itoa(a.Type) + "\".")
 			return
 		}
-
 		g.Actions = append(g.Actions, a)
 
-		// Allow the strategies to "see" the new action
+		// Allow the strategies to "see" the game state after the action is completed
 		for _, p := range g.Players {
 			p.Strategy.ActionHappened(p.Strategy, g, a)
 		}

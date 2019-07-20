@@ -16,6 +16,6 @@ func (d *Hyphenated) Discard(g *Game) *Action {
 	hp := d.Players[d.Us]
 	return &Action{
 		Type:   actionTypeDiscard,
-		Target: hp.GetChop(g).Order,
+		Target: hp.GetChop(g, d).Order,
 	}
 }

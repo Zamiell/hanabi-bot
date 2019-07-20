@@ -14,6 +14,20 @@ type Suit struct {
 	OneOfEach  bool
 }
 
+func (s *Suit) ColorValue(g *Game) int {
+	if len(s.ClueColors) > 1 {
+		log.Fatal("Dual-color variants are not currently implemented.")
+	}
+
+	for i, color := range variants[g.Variant].ClueColors {
+		if color == s.ClueColors[0] {
+			return i
+		}
+	}
+
+	return -1
+}
+
 var (
 	variants map[string]*Variant
 )

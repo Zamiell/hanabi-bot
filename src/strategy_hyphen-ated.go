@@ -9,11 +9,12 @@ import "strconv"
 
 func NewHyphenated() *Strategy {
 	return &Strategy{
-		Name:           "Hyphen-ated",
-		Start:          HyphenatedStart,
-		GetAction:      HyphenatedGetAction,
-		ActionHappened: HyphenatedActionHappened,
-		Data:           &Hyphenated{},
+		Name:            "Hyphen-ated",
+		Start:           HyphenatedStart,
+		GetAction:       HyphenatedGetAction,
+		ActionAnnounced: HyphenatedActionAnnounced,
+		ActionHappened:  HyphenatedActionHappened,
+		Data:            &Hyphenated{},
 	}
 }
 
@@ -23,18 +24,6 @@ type Hyphenated struct {
 	Cards     []*HyphenCard
 	EarlyGame bool
 }
-
-// We store extra information about each card
-type HyphenCard struct {
-	Playable bool
-	Trash    bool
-}
-
-const (
-	hyphenClueTypeSave = iota
-	hyphenClueTypePlay
-	// hyphenClueTypeFix
-)
 
 // HyphenatedStart is called before the first move occurs
 func HyphenatedStart(s *Strategy, g *Game, us int) {
@@ -54,51 +43,29 @@ func HyphenatedStart(s *Strategy, g *Game, us int) {
 	// Initialize the objects that will store additional information about each card
 	d.Cards = make([]*HyphenCard, 0)
 	for i := 0; i < len(g.Deck); i++ {
-		d.Cards = append(d.Cards, &HyphenCard{})
+		d.Cards = append(d.Cards, &HyphenCard{
+			Order: i,
+			// KnownPossibleCards: make([]string),
+		})
 	}
 }
 
-// HyphenatedActionHappened is called when a player clues, plays, or discards
-func HyphenatedActionHappened(s *Strategy, g *Game, a *Action) {
-	if a.Type == actionTypeClue {
-		HyphenatedActionHappenedClue(s, g, a)
-	} else if a.Type == actionTypePlay {
-	} else if a.Type == actionTypeDiscard {
-	}
-}
-
-func HyphenatedActionHappenedClue(s *Strategy, g *Game, a *Action) {
+// HyphenatedActionAnnounced is called before a player clues, plays, or discards
+func HyphenatedActionAnnounced(s *Strategy, g *Game, a *Action) {
 	d := s.Data.(*Hyphenated)
-	p := g.Players[a.Target]
-	hp := d.Players[a.Target]
-	interpretation := d.GetClueInterpretation(g, a)
-	if interpretation == hyphenClueTypePlay {
-		focusedCard := d.GetClueFocus(g, a.Target, a.Clue)
-		d.Cards[focusedCard.Order].Playable = true
-	}
 
-	// Update all playable cards based on good touch principle
-	// TODO 1: this must also be done after a card is played
-	// TODO 2: don't mark a card as playable if it is known trash
-	for _, c := range p.Hand {
-		if c.IsClued() && !d.Cards[c.Order].Playable {
-			isplayable := true
-			for _, s := range c.PossibleSuits {
-				for _, r := range c.PossibleRanks {
-					if r > g.Stacks[s.Index]+1 {
-						isplayable = false
-						break
-					}
-				}
-			}
-			if isplayable {
-				// log.Info(c.Name() + " is playable." + strconv.FormatBool(c.IsClued()))
-				d.Cards[c.Order].Playable = true
-			}
-		}
+	if a.Type == actionTypeClue {
+		HyphenatedActionAnnouncedClue(d, g, a)
 	}
+}
 
-	hp.UpdateChop(g)
+// HyphenatedActionHappened is called after a player clues, plays, or discards
+func HyphenatedActionHappened(s *Strategy, g *Game, a *Action) {
+	d := s.Data.(*Hyphenated)
+
+	if a.Type == actionTypeClue {
+		HyphenatedActionHappenedClue(d, g, a)
+	}
 }
 
 // HyphenatedGetAction is called when it gets to our turn
@@ -109,11 +76,11 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 
 	n := 0
 	if g.Clues > 0 {
-		// Check for the next guy's chop
-		a = d.CheckNextPlayerChop(g)
+		// Check to see if the next player has a safe discard
+		a = d.CheckNextPlayerSave(g)
 		n++
 		if a != nil {
-			log.Info("Using logic " + strconv.Itoa(n) + ": CheckNextPlayerChop")
+			log.Info("Using logic " + strconv.Itoa(n) + ": CheckNextPlayerSave")
 			return a
 		}
 

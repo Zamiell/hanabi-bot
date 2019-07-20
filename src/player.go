@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sort"
 	"strconv"
 )
 
@@ -23,10 +24,13 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 	// Apply the positive and negative clues to the cards in the hand
 	p2 := g.Players[a.Target]
 	cardsTouched := 0
+	slots := make([]int, 0)
 	for _, c := range p2.Hand {
 		positive := false
 		if variantIsCardTouched(g, a.Clue, c) {
+			c.Touched = true
 			cardsTouched++
+			slots = append(slots, c.Slot)
 			positive = true
 		}
 		c.Clues = append(c.Clues, &CardClue{
@@ -87,6 +91,18 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 	if cardsTouched != 1 {
 		text += "s"
 	}
+	if cardsTouched > 0 {
+		text += " in slot"
+		if cardsTouched != 1 {
+			text += "s"
+		}
+		text += " "
+		sort.Ints(slots)
+		for _, slot := range slots {
+			text += strconv.Itoa(slot) + ", "
+		}
+		text = trimSuffix(text, ", ")
+	}
 	text += ". (There are now " + strconv.Itoa(g.Clues) + " clues left.)"
 	log.Info(text)
 }
@@ -127,6 +143,8 @@ func (p *Player) PlayCard(g *Game, c *Card) {
 		g.Strikes++
 		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " fails to plays " + c.Name() + ". (The team is now at " + strconv.Itoa(g.Strikes) + " strikes.)")
 	}
+	c.Holder = -1
+	c.Slot = -1
 }
 
 func (p *Player) DiscardCard(g *Game, c *Card) {
@@ -135,6 +153,8 @@ func (p *Player) DiscardCard(g *Game, c *Card) {
 	if !c.Failed {
 		log.Info("Turn " + strconv.Itoa(g.Turn+1) + " - " + p.Name + " discards " + c.Name() + ".")
 	}
+	c.Holder = -1
+	c.Slot = -1
 }
 
 func (p *Player) DrawCard(g *Game) {
@@ -147,6 +167,12 @@ func (p *Player) DrawCard(g *Game) {
 	c := g.Deck[g.DeckIndex]
 	g.DeckIndex++
 	p.Hand = append(p.Hand, c)
+	c.Holder = p.Index
+
+	// Update the slot numbers of all of the cards in the hand
+	for i, c2 := range p.Hand {
+		c2.Slot = len(p.Hand) - i
+	}
 
 	// Check to see if that was the last card drawn
 	if g.DeckIndex >= len(g.Deck) {
@@ -203,7 +229,7 @@ func (p *Player) GetCardsTouchedByClue(g *Game, clue *Clue) []*Card {
 func (p *Player) GetFreshCardsTouchedByClue(g *Game, clue *Clue) []*Card {
 	freshCards := make([]*Card, 0)
 	for _, c := range p.Hand {
-		if c.IsClued() {
+		if c.Touched {
 			continue
 		}
 		if variantIsCardTouched(g, clue, c) {

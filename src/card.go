@@ -8,47 +8,23 @@ type Card struct {
 	Suit          *Suit
 	Rank          int
 	Order         int
-	Clues         []*CardClue
-	JustTouched   bool // Touched by the last clue that was given
+	Holder        int
+	Slot          int
+	Clues         []*CardClue // This is a list that includes both positive and negative clues
+	Touched       bool        // True if it has one or more positive clues on it
+	JustTouched   bool        // Touched by the last clue that was given
 	PossibleSuits []*Suit
 	PossibleRanks []int
-	PossibleCards map[string]int
+	PossibleCards map[string]int // Maps card identities to count
 	Revealed      bool
 	Played        bool
 	Discarded     bool
 	Failed        bool // If the card failed to play
 }
-type CardClue struct {
-	Type     int
-	Value    int
-	Positive bool
-}
-
-func (c *CardClue) Name(g *Game) string {
-	name := ""
-	if c.Type == 0 {
-		name = string(c.Value)
-	} else {
-		name = variants[g.Variant].ClueColors[c.Value]
-	}
-	if !c.Positive {
-		name = "-" + name
-	}
-	return name
-}
 
 func (c *Card) Name() string {
 	name := c.Suit.Name + " " + strconv.Itoa(c.Rank)
 	return name
-}
-
-func (c *Card) IsClued() bool {
-	for _, clue := range c.Clues {
-		if clue.Positive {
-			return true
-		}
-	}
-	return false
 }
 
 func (c *Card) IsPlayable(g *Game) bool {

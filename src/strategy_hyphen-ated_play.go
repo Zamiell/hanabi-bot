@@ -5,7 +5,9 @@ func (d *Hyphenated) CheckPlayableCards(g *Game) *Action {
 	p := g.Players[d.Us]
 	playables := make([]*Card, 0)
 	for _, c := range p.Hand {
-		if d.Cards[c.Order].Playable {
+		hc := d.Cards[c.Order]
+
+		if hc.Playable {
 			playables = append(playables, c)
 		}
 	}
