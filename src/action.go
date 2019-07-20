@@ -12,21 +12,6 @@ type Action struct {
 	Target int `json:"target"`
 }
 
-type Clue struct {
-	Type  int `json:"type"` // 0 is a rank clue, 1 if a clue color
-	Value int `json:"value"`
-}
-
-func (c *Clue) Name(g *Game) string {
-	if c.Type == clueTypeRank {
-		return string(c.Value)
-	} else if c.Type == clueTypeColor {
-		return variants[g.Variant].ClueColors[c.Value]
-	}
-
-	return ""
-}
-
 func actionClue(g *Game, p *Player, a *Action) {
 	// Validate that the target of the clue is sane
 	if a.Target < 0 || a.Target > len(g.Players)-1 {

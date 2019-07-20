@@ -79,6 +79,10 @@ func (hc *HyphenCard) Needs2Save(g *Game, d *Hyphenated) bool {
 func (hc *HyphenCard) IsDelayedPlayable(g *Game, d *Hyphenated) bool {
 	c := g.Deck[hc.Order]
 
+	if c.Rank <= g.Stacks[c.Suit.Index]+1 {
+		return false
+	}
+
 	// Check to see if all the cards leading up to this card are clued in someone's hand
 	for inBetweenRank := g.Stacks[c.Suit.Index] + 1; inBetweenRank < c.Rank; inBetweenRank++ {
 		cardTouched := false
@@ -101,7 +105,7 @@ func (hc *HyphenCard) IsDelayedPlayable(g *Game, d *Hyphenated) bool {
 					}
 				} else {
 					// Check to see if the card is touched in anyone else's hand
-					if c.Touched || hc2.Known {
+					if c2.Touched || hc2.Known {
 						cardTouched = true
 						break
 					}

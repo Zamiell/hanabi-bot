@@ -136,6 +136,7 @@ func (d *Hyphenated) CheckViableClue(g *Game, i int, j int, k int, clueType int)
 					continue
 				}
 				if c.Suit == c2.Suit && c.Rank == c2.Rank {
+					//log.Debug("Clue " + clue.Name(g) + " failed because the touched cards contain a duplicate of each other.")
 					return nil
 				}
 			}
@@ -152,11 +153,13 @@ func (d *Hyphenated) CheckViableClue(g *Game, i int, j int, k int, clueType int)
 					// Don't potentialy duplicate clued cards in our hand
 					mapIndex := c.Suit.Name + strconv.Itoa(c.Rank)
 					if c2.Touched && c2.PossibleCards[mapIndex] > 0 {
+						//log.Debug("Clue " + clue.Name(g) + " failed because it could potentially duplicate a card in our hand.")
 						return nil
 					}
 				} else {
 					// Don't duplicate cards in other players hands
 					if c2.Touched && c.Suit == c2.Suit && c.Rank == c2.Rank {
+						//log.Debug("Clue " + clue.Name(g) + " failed because it would duplicate a card in another player's hand.")
 						return nil
 					}
 				}
@@ -165,14 +168,18 @@ func (d *Hyphenated) CheckViableClue(g *Game, i int, j int, k int, clueType int)
 	}
 
 	if clueType == hyphenClueTypePlay {
-		// Check to see if the card would misplay if we clued it
 		c := d.GetClueFocus(g, i, clue)
-		if c == nil || !c.IsPlayable(g) {
+		hc := d.Cards[c.Order]
+
+		// Check to see if the card would misplay if we clued it
+		if c == nil || (!c.IsPlayable(g) && !hc.IsDelayedPlayable(g, d)) {
+			//log.Debug("Clue " + clue.Name(g) + " failed because the focus of the clue would misplay.")
 			return nil
 		}
 
 		// Check to see if it will be interpreted as a 2 Save or a 5 Save
 		if c == hp.GetChop(g, d) && j == clueTypeRank && (k == 2 || k == 5) {
+			//log.Debug("Clue " + clue.Name(g) + " failed because it would be interpreted as a 2 Save or a 5 Save.")
 			return nil
 		}
 	}

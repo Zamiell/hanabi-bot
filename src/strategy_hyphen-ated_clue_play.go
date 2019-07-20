@@ -17,6 +17,12 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 				!hc.Playable {
 
 				playableCardsToGet = append(playableCardsToGet, c)
+
+				if c.IsPlayable(g) {
+					log.Debug(c.Name() + " in " + g.Players[c.Holder].Name + "'s hand is playable...")
+				} else if hc.IsDelayedPlayable(g, d) {
+					log.Debug(c.Name() + " in " + g.Players[c.Holder].Name + "'s hand is delayed playable...")
+				}
 			}
 		}
 	}
@@ -61,6 +67,10 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 				viableClues = append(viableClues, clue)
 			}
 		}
+	}
+
+	if len(viableClues) == 0 {
+		return nil
 	}
 
 	// Prefer the clues that touch the greatest amount of cards
