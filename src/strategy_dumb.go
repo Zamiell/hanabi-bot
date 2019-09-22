@@ -48,7 +48,7 @@ func DumbGetAction(s *Strategy, g *Game) *Action {
 	// Alternate between two brainless strategies
 	d.InvertDumbness()
 
-	if d.BlindPlay && g.Clues > 0 {
+	if d.BlindPlay && g.ClueTokens > 0 {
 		// Get our slot 1 card
 		p := g.Players[d.Us]
 		firstCard := p.GetSlot(1)

@@ -75,7 +75,7 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 	var a *Action
 
 	n := 0
-	if g.Clues > 0 {
+	if g.ClueTokens > 0 {
 		// Check to see if the next player has a safe discard
 		a = d.CheckNextPlayerSave(g)
 		n++
@@ -109,7 +109,7 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 		return a
 	}
 
-	if g.Clues != 8 {
+	if g.ClueTokens != 8 {
 		a = d.Discard(g)
 		n++
 		if a != nil {
@@ -118,7 +118,7 @@ func HyphenatedGetAction(s *Strategy, g *Game) *Action {
 		}
 	}
 
-	if g.Clues > 0 {
+	if g.ClueTokens > 0 {
 		// Give a 5 Stall clue
 		a = d.Check5Stall(g)
 		n++

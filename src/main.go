@@ -45,7 +45,7 @@ func main() {
 		PossibleCards: make(map[string]int),
 		Stacks:        make([]int, 0),
 		DiscardPile:   make([]*Card, 0),
-		Clues:         maxClues,
+		ClueTokens:    maxClues,
 		Actions:       make([]*Action, 0),
 		EndTurn:       -1,
 	}

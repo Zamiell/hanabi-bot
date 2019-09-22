@@ -17,7 +17,7 @@ type Game struct {
 	Turn          int
 	FirstPlayer   int
 	ActivePlayer  int
-	Clues         int
+	ClueTokens    int
 	Score         int
 	Strikes       int
 	Actions       []*Action

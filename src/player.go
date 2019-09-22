@@ -19,7 +19,7 @@ type Player struct {
 
 func (p *Player) GiveClue(a *Action, g *Game) {
 	// Keep track that someone clued (performing a clue costs one "Clue Token")
-	g.Clues--
+	g.ClueTokens--
 
 	// Apply the positive and negative clues to the cards in the hand
 	p2 := g.Players[a.Target]
@@ -103,7 +103,7 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 		}
 		text = trimSuffix(text, ", ")
 	}
-	text += ". (There are now " + strconv.Itoa(g.Clues) + " clues left.)"
+	text += ". (There are now " + strconv.Itoa(g.ClueTokens) + " clues left.)"
 	log.Info(text)
 }
 
@@ -127,12 +127,12 @@ func (p *Player) PlayCard(g *Game, c *Card) {
 
 		// Give the team a clue if the final card of the suit was played
 		if c.Rank == 5 {
-			g.Clues++
+			g.ClueTokens++
 
 			// The extra clue is wasted if the team is at the maximum amount of clues already
 			clueLimit := maxClues
-			if g.Clues > clueLimit {
-				g.Clues = clueLimit
+			if g.ClueTokens > clueLimit {
+				g.ClueTokens = clueLimit
 			}
 		}
 

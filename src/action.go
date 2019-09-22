@@ -28,7 +28,7 @@ func actionClue(g *Game, p *Player, a *Action) {
 	}
 
 	// Validate that there are clues available to use
-	if g.Clues == 0 {
+	if g.ClueTokens == 0 {
 		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to give a clue " +
 			"while the team was at 0 clues.")
 		return
@@ -107,13 +107,13 @@ func actionDiscard(g *Game, p *Player, a *Action) {
 
 	// Validate that the team is not at the maximum amount of clues
 	// (the client should enforce this, but do a check just in case)
-	if g.Clues == maxClues {
+	if g.ClueTokens == maxClues {
 		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to discard while the team " +
 			"was at the maximum amount of clues.")
 		return
 	}
 
-	g.Clues++
+	g.ClueTokens++
 	c := p.RemoveCard(a.Target, g)
 	p.DiscardCard(g, c)
 	p.DrawCard(g)
