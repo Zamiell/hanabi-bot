@@ -3,6 +3,7 @@ package main
 import (
 	"sort"
 	"strconv"
+	"strings"
 )
 
 type Player struct {
@@ -101,7 +102,7 @@ func (p *Player) GiveClue(a *Action, g *Game) {
 		for _, slot := range slots {
 			text += strconv.Itoa(slot) + ", "
 		}
-		text = trimSuffix(text, ", ")
+		text = strings.TrimSuffix(text, ", ")
 	}
 	text += ". (There are now " + strconv.Itoa(g.ClueTokens) + " clues left.)"
 	log.Info(text)
