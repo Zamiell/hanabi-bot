@@ -39,13 +39,16 @@ Note that these steps require **an elevated (administrator) command-shell**.
 * Clone the repository:
   * `mkdir %GOPATH%\src\github.com\Zamiell`
   * `cd %GOPATH%\src\github.com\Zamiell`
-  * `git clone git@github.com:Zamiell/hanabi-bot.git` <br />
-  (or clone a fork, if you are doing development work)
+  * If you already have an SSH keypair and have the public key attached to your GitHub profile, then use the following command to clone the repostory via SSH:
+    * `git clone git@github.com:Zamiell/hanabi-bot.git`
+  * If you do not already have an SSH keypair, then use the following command to clone the repository via HTTPS:
+    * `git clone https://github.com/Zamiell/hanabi-bot.git`
+  * Or, if you are doing development work, then clone your forked version of the repository. For example:
+    * `git clone https://github.com/[Your_Username]/hanabi-bot.git`
+* Enter the cloned repository:
   * `cd hanabi-bot`
 * Install the Golang project dependencies:
-  * `cd src`
   * `go get -u -v ./...`
-  * `cd ..`
 * Install the Golang linter:
   * `go get -u -v "github.com/golangci/golangci-lint/cmd/golangci-lint"`
 * Install the VSCode extension for Golang:
