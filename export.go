@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/atotto/clipboard"
 )
@@ -66,4 +67,6 @@ func (g *Game) Export() {
 		log.Fatal("Failed to write to the clipboard:", err)
 		return
 	}
+
+	fmt.Println(string(exportJSON))
 }
