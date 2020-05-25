@@ -15,7 +15,6 @@ type Game struct {
 	Stacks        []int
 	DiscardPile   []*Card
 	Turn          int
-	FirstPlayer   int
 	ActivePlayer  int
 	ClueTokens    int
 	Score         int
@@ -30,11 +29,11 @@ type Game struct {
 */
 
 func (g *Game) InitDeck() {
-	// Create the deck
+	// Create the deck.
 	for _, suit := range variants[g.Variant].Suits {
 		for _, rank := range variants[g.Variant].Ranks {
 			// In a normal suit of Hanabi,
-			// there are three 1's, two 2's, two 3's, two 4's, and one five
+			// there are three 1's, two 2's, two 3's, two 4's, and one five.
 			var amountToAdd int
 			if rank == 1 {
 				amountToAdd = 3
@@ -45,11 +44,11 @@ func (g *Game) InitDeck() {
 			}
 
 			for i := 0; i < amountToAdd; i++ {
-				// Add the card to the deck
+				// Add the card to the deck.
 				c := &Card{
 					Suit: suit,
 					Rank: rank,
-					// We can't set the order here because the deck will be shuffled later
+					// We can't set the order here because the deck will be shuffled later.
 					Holder:        -1,
 					Slot:          -1,
 					Clues:         make([]*CardClue, 0),
@@ -67,7 +66,7 @@ func (g *Game) InitDeck() {
 		}
 	}
 
-	// Copy all of the possibilities into every card
+	// Copy all of the possibilities into every card.
 	for _, c := range g.Deck {
 		for k, v := range g.PossibleCards {
 			c.PossibleCards[k] = v
@@ -83,27 +82,27 @@ func (g *Game) InitStacks() {
 }
 
 func (g *Game) Shuffle() {
-	// Shuffle the deck
+	// Shuffle the deck.
 	// From: https://stackoverflow.com/questions/12264789/shuffle-array-in-go
 	for i := range g.Deck {
 		j := rand.Intn(i + 1)
 		g.Deck[i], g.Deck[j] = g.Deck[j], g.Deck[i]
 	}
 
-	// Mark the order of all of the cards in the deck
+	// Mark the order of all of the cards in the deck.
 	for i, c := range g.Deck {
 		c.Order = i
 	}
 
 	/*
-		// Log the deal (so that it can be distributed to others if necessary)
-		log.Info("--------------------------------------------------")
-		log.Info("Deal for seed: " + strconv.Itoa(g.Seed) + " (from top to bottom)")
-		log.Info("(cards are dealt to a player until their hand fills up before moving on to the next one)")
+		// Log the deal (so that it can be distributed to others if necessary).
+		logger.Info("--------------------------------------------------")
+		logger.Info("Deal for seed: " + strconv.Itoa(g.Seed) + " (from top to bottom)")
+		logger.Info("(cards are dealt to a player until their hand fills up before moving on to the next one)")
 		for i, c := range g.Deck {
-			log.Info(strconv.Itoa(i+1) + ") " + c.Name(g))
+			logger.Info(strconv.Itoa(i+1) + ") " + c.Name(g))
 		}
-		log.Info("--------------------------------------------------")
+		logger.Info("--------------------------------------------------")
 	*/
 }
 
@@ -123,42 +122,29 @@ func (g *Game) InitPlayers() {
 		g.Players = append(g.Players, p)
 	}
 
-	// Get a random player to start first (based on the game seed)
-	g.FirstPlayer = rand.Intn(len(g.Players))
-	g.ActivePlayer = g.FirstPlayer
-
-	// Shuffle the order of the players
-	// (otherwise, the seat order would always correspond to the order that
-	// the players joined the game in)
-	// From: https://stackoverflow.com/questions/12264789/shuffle-array-in-go
-	for i := range g.Players {
-		j := rand.Intn(i + 1)
-		g.Players[i], g.Players[j] = g.Players[j], g.Players[i]
-	}
-
-	// Store the player indexes for later
+	// Store the player indexes for later.
 	for i, p := range g.Players {
 		p.Index = i
 	}
 
-	log.Info("The seating of the players is as follows:")
+	logger.Info("The seating of the players is as follows:")
 	for i, p := range g.Players {
 		str := strconv.Itoa(i+1) + ") " + p.Name
-		log.Info(str)
+		logger.Info(str)
 	}
-	log.Info("----------------------------------------")
+	logger.Info("----------------------------------------")
 }
 
 func (g *Game) DealStartingHands() {
-	log.Info("Performing the initial deal:")
+	logger.Info("Performing the initial deal:")
 	handSize := g.GetHandSize()
 	for _, p := range g.Players {
 		for i := 0; i < handSize; i++ {
 			p.DrawCard(g)
 		}
 	}
-	log.Info("----------------------------------------")
-	log.Info(g.Players[g.ActivePlayer].Name + " goes first.")
+	logger.Info("----------------------------------------")
+	logger.Info(g.Players[g.ActivePlayer].Name + " goes first.")
 }
 
 /*
@@ -166,16 +152,16 @@ func (g *Game) DealStartingHands() {
 */
 
 func (g *Game) CheckEnd() bool {
-	// Check for 3 strikes
-	if g.Strikes == 3 {
-		g.EndCondition = endConditionStrikeout
+	// Check for 3 strikes.
+	if g.Strikes == MaxStrikeNum {
+		g.EndCondition = EndConditionStrikeout
 		return true
 	}
 
 	// Check to see if the final go-around has completed
-	// (which is initiated after the last card is played from the deck)
+	// (which is initiated after the last card is played from the deck).
 	if g.Turn == g.EndTurn {
-		g.EndCondition = endConditionNormal
+		g.EndCondition = EndConditionNormal
 		return true
 	}
 
@@ -196,12 +182,12 @@ func (g *Game) GetHandSize() int {
 		return 3
 	}
 
-	log.Fatal("Failed to get the hand size for " + strconv.Itoa(numPlayers) + " players.")
+	logger.Fatal("Failed to get the hand size for " + strconv.Itoa(numPlayers) + " players.")
 	return -1
 }
 
 // GetSpecificCardNum returns the total cards in the deck of the specified suit and rank
-// as well as how many of those that have been already discarded
+// as well as how many of those that have been already discarded.
 func (g *Game) GetSpecificCardNum(suit *Suit, rank int) (int, int) {
 	total := 0
 	discarded := 0

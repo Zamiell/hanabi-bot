@@ -58,8 +58,8 @@ func (c *Card) CouldBeRank(r int) bool {
 	return false
 }
 
-// NeedsToBePlayed returns true if the card is not yet played
-// and is still needed to be played in order to get the maximum score
+// NeedsToBePlayed returns true if the card is not yet played and is still needed to be played in
+// order to get the maximum score.
 func (c *Card) NeedsToBePlayed(g *Game) bool {
 	// First, check to see if a copy of this card has already been played
 	for _, c2 := range g.Deck {
@@ -71,8 +71,8 @@ func (c *Card) NeedsToBePlayed(g *Game) bool {
 		}
 	}
 
-	// Second, check to see if it is still possible to play this card
-	// (the preceding cards in the suit might have already been discarded)
+	// Second, check to see if it is still possible to play this card.
+	// (The preceding cards in the suit might have already been discarded.)
 	for i := 1; i < c.Rank; i++ {
 		total, discarded := g.GetSpecificCardNum(c.Suit, i)
 		if total == discarded {
@@ -81,19 +81,18 @@ func (c *Card) NeedsToBePlayed(g *Game) bool {
 		}
 	}
 
-	// By default, all cards not yet played will need to be played
+	// By default, all cards not yet played will need to be played.
 	return true
 }
 
 func (c *Card) RemovePossibility(suit *Suit, rank int, removeAll bool) {
-	// Every card has a possibility map that maps card identities to count
+	// Every card has a possibility map that maps card identities to count.
 	mapIndex := suit.Name + strconv.Itoa(rank)
 	cardsLeft := c.PossibleCards[mapIndex]
 	if cardsLeft > 0 {
 		// Remove one or all possibilities for this card,
-		// (depending on whether the card was clued
-		// or if we saw someone draw a copy of this card)
-		cardsLeft := cardsLeft - 1
+		// depending on whether the card was clued or if we saw someone draw a copy of this card.
+		cardsLeft--
 		if removeAll {
 			cardsLeft = 0
 		}

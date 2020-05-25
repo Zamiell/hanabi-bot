@@ -5,78 +5,71 @@ import (
 )
 
 type Action struct {
-	Type int   `json:"type"` // 0 is clue, 1 is play, 2 is discard
-	Clue *Clue `json:"clue"`
+	Type int `json:"type"` // 0 is play, 1 is discard, 2 is color clue, 3 is rank clue
 	// If a clue, matches the index of the player
 	// If a play/discard, matches the order of the card
 	Target int `json:"target"`
+	Value  int `json:"value"`
 }
 
 func actionClue(g *Game, p *Player, a *Action) {
-	// Validate that the target of the clue is sane
+	// Validate that the target of the clue is sane.
 	if a.Target < 0 || a.Target > len(g.Players)-1 {
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to clue an " +
-			"invalid clue target of \"" + strconv.Itoa(a.Target) + "\".")
+		logger.Fatal("The strategy of \"" + p.Strategy.Name + "\" " +
+			"tried to clue an invalid clue target of \"" + strconv.Itoa(a.Target) + "\".")
 		return
 	}
 
-	// Validate that the player is not giving a clue to themselves
+	// Validate that the player is not giving a clue to themselves.
 	if g.ActivePlayer == a.Target {
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to give a clue " +
-			"to themself.")
+		logger.Fatal("The strategy of \"" + p.Strategy.Name + "\" " +
+			"tried to give a clue to themself.")
 		return
 	}
 
-	// Validate that there are clues available to use
+	// Validate that there are clues available to use.
 	if g.ClueTokens == 0 {
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to give a clue " +
-			"while the team was at 0 clues.")
+		logger.Fatal("The strategy of \"" + p.Strategy.Name + "\" " +
+			"tried to give a clue while the team was at 0 clues.")
 		return
 	}
 
-	// Validate that the clue type is sane
-	if a.Clue.Type < clueTypeRank || a.Clue.Type > clueTypeColor {
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to give a clue " +
-			"with an invalid clue type of \"" + strconv.Itoa(a.Clue.Type) + "\".")
-		return
-	}
-
-	// Validate that rank clues are valid
-	if a.Clue.Type == clueTypeRank {
+	// Validate that rank clues are valid.
+	if a.Type == ActionTypeRankClue {
 		valid := false
 		for _, rank := range variants[g.Variant].ClueRanks {
-			if rank == a.Clue.Value {
+			if rank == a.Value {
 				valid = true
 				break
 			}
 		}
 		if !valid {
-			log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to give a clue " +
-				"with an invalid rank of \"" + strconv.Itoa(a.Clue.Value) + "\".")
+			logger.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to give a clue " +
+				"with an invalid rank of \"" + strconv.Itoa(a.Value) + "\".")
 			return
 		}
 	}
 
-	// Validate that the color clues are valid
-	if a.Clue.Type == clueTypeColor &&
-		(a.Clue.Value < 0 || a.Clue.Value > len(variants[g.Variant].ClueColors)-1) {
+	// Validate that the color clues are valid.
+	if a.Type == ActionTypeColorClue &&
+		(a.Value < 0 || a.Value > len(variants[g.Variant].ClueColors)-1) {
 
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to give a clue " +
-			"with an invalid color of \"" + strconv.Itoa(a.Clue.Value) + "\".")
+		logger.Fatal("The strategy of \"" + p.Strategy.Name + "\" " +
+			"tried to give a clue with an invalid color of \"" + strconv.Itoa(a.Value) + "\".")
 		return
 	}
 
-	// Validate that the clue touches at least one card in the hand
+	// Validate that the clue touches at least one card in the hand.
 	touchedAtLeastOneCard := false
 	p2 := g.Players[a.Target]
 	for _, c := range p2.Hand {
-		if variantIsCardTouched(g, a.Clue, c) {
+		if variantIsCardTouched(g, NewClue(a), c) {
 			touchedAtLeastOneCard = true
 			break
 		}
 	}
 	if !touchedAtLeastOneCard {
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to give a clue " +
+		logger.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to give a clue " +
 			"that touches no cards in the hand.")
 		return
 	}
@@ -85,36 +78,36 @@ func actionClue(g *Game, p *Player, a *Action) {
 }
 
 func actionPlay(g *Game, p *Player, a *Action) {
-	// Validate that the card is in their hand
+	// Validate that the card is in their hand.
 	if !p.InHand(a.Target) {
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to play a card that was " +
+		logger.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to play a card that was " +
 			"not in their hand.")
 		return
 	}
 
-	c := p.RemoveCard(a.Target, g)
+	c := p.RemoveCard(a.Target)
 	p.PlayCard(g, c)
 	p.DrawCard(g)
 }
 
 func actionDiscard(g *Game, p *Player, a *Action) {
-	// Validate that the card is in their hand
+	// Validate that the card is in their hand.
 	if !p.InHand(a.Target) {
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to discard a card that was " +
+		logger.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to discard a card that was " +
 			"not in their hand.")
 		return
 	}
 
-	// Validate that the team is not at the maximum amount of clues
-	// (the client should enforce this, but do a check just in case)
-	if g.ClueTokens == maxClues {
-		log.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to discard while the team " +
+	// Validate that the team is not at the maximum amount of clues.
+	// (The client should enforce this, but do a check just in case.)
+	if g.ClueTokens == MaxClueNum {
+		logger.Fatal("The strategy of \"" + p.Strategy.Name + "\" tried to discard while the team " +
 			"was at the maximum amount of clues.")
 		return
 	}
 
 	g.ClueTokens++
-	c := p.RemoveCard(a.Target, g)
+	c := p.RemoveCard(a.Target)
 	p.DiscardCard(g, c)
 	p.DrawCard(g)
 }

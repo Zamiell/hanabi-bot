@@ -18,7 +18,7 @@ type Strategy struct {
 func stratInit() {
 	strategies = make(map[string]func() *Strategy)
 
-	// Add a line below for each new strategy
+	// Add a line below for each new strategy.
 	strategies["Dumb"] = NewDumb
 	strategies["Hyphen-ated"] = NewHyphenated
 }

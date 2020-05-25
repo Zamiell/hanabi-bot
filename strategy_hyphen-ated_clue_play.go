@@ -11,17 +11,19 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 			hc := d.Cards[c.Order]
 			if (c.IsPlayable(g) || hc.IsDelayedPlayable(g, d)) &&
 				// This card already has a clue on it,
-				// so cluing it again would not satisfy Minimum Clue Value Principle
+				// so cluing it again would not satisfy Minimum Clue Value Principle.
 				!c.Touched &&
-				// This card was already gotten via a Finesse
+				// This card was already gotten via a Finesse.
 				!hc.Playable {
 
 				playableCardsToGet = append(playableCardsToGet, c)
 
 				if c.IsPlayable(g) {
-					log.Debug(c.Name() + " in " + g.Players[c.Holder].Name + "'s hand is playable...")
+					logger.Debug(c.Name() + " in " + g.Players[c.Holder].Name + "'s " +
+						"hand is playable...")
 				} else if hc.IsDelayedPlayable(g, d) {
-					log.Debug(c.Name() + " in " + g.Players[c.Holder].Name + "'s hand is delayed playable...")
+					logger.Debug(c.Name() + " in " + g.Players[c.Holder].Name + "'s " +
+						"hand is delayed playable...")
 				}
 			}
 		}
@@ -32,28 +34,10 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 		var clue *PossibleClue
 		var alreadyClued bool
 
-		// Rank clue
-		alreadyClued = false
-		for _, clue := range viableClues {
-			if clue.Clue.Type == clueTypeRank &&
-				clue.Clue.Value == c.Rank &&
-				clue.Target == c.Holder {
-
-				alreadyClued = true
-				break
-			}
-		}
-		if !alreadyClued {
-			clue = d.CheckViableClue(g, c.Holder, clueTypeRank, c.Rank, hyphenClueTypePlay)
-			if clue != nil {
-				viableClues = append(viableClues, clue)
-			}
-		}
-
 		// Color clue
 		alreadyClued = false
 		for _, clue := range viableClues {
-			if clue.Clue.Type == clueTypeColor &&
+			if clue.Clue.Type == ClueTypeColor &&
 				clue.Clue.Value == c.Suit.ColorValue(g) &&
 				clue.Target == c.Holder {
 
@@ -62,7 +46,37 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 			}
 		}
 		if !alreadyClued {
-			clue = d.CheckViableClue(g, c.Holder, clueTypeColor, c.Suit.ColorValue(g), hyphenClueTypePlay)
+			clue = d.CheckViableClue(
+				g,
+				c.Holder,
+				ClueTypeColor,
+				c.Suit.ColorValue(g),
+				hyphenClueTypePlay,
+			)
+			if clue != nil {
+				viableClues = append(viableClues, clue)
+			}
+		}
+
+		// Rank clue
+		alreadyClued = false
+		for _, clue := range viableClues {
+			if clue.Clue.Type == ClueTypeRank &&
+				clue.Clue.Value == c.Rank &&
+				clue.Target == c.Holder {
+
+				alreadyClued = true
+				break
+			}
+		}
+		if !alreadyClued {
+			clue = d.CheckViableClue(
+				g,
+				c.Holder,
+				ClueTypeRank,
+				c.Rank,
+				hyphenClueTypePlay,
+			)
 			if clue != nil {
 				viableClues = append(viableClues, clue)
 			}
@@ -73,14 +87,20 @@ func (d *Hyphenated) CheckPlayClues(g *Game) *Action {
 		return nil
 	}
 
-	// Prefer the clues that touch the greatest amount of cards
+	// Prefer the clues that touch the greatest amount of cards.
 	for i := g.GetHandSize(); i >= 0; i-- {
 		for _, viableClue := range viableClues {
 			if viableClue.CardsClued == i {
+				var actionType int
+				if viableClue.Clue.Type == ClueTypeColor {
+					actionType = ActionTypeColorClue
+				} else if viableClue.Clue.Type == ClueTypeRank {
+					actionType = ActionTypeRankClue
+				}
 				return &Action{
-					Type:   actionTypeClue,
-					Clue:   viableClue.Clue,
+					Type:   actionType,
 					Target: viableClue.Target,
+					Value:  viableClue.Clue.Value,
 				}
 			}
 		}

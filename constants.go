@@ -1,23 +1,27 @@
 package main
 
 const (
-	actionTypeClue = iota
-	actionTypePlay
-	actionTypeDiscard
+	ActionTypePlay = iota
+	ActionTypeDiscard
+	ActionTypeColorClue
+	ActionTypeRankClue
 )
 
 const (
-	clueTypeRank = iota
-	clueTypeColor
+	ClueTypeColor = iota
+	ClueTypeRank
 )
 
 const (
-	endConditionInProgress = iota
-	endConditionNormal
-	endConditionStrikeout
+	EndConditionInProgress = iota
+	EndConditionNormal
+	EndConditionStrikeout
 )
 
 const (
 	// The maximum amount of clues (and the amount of clues that players start a game with)
-	maxClues = 8
+	MaxClueNum = 8
+
+	// The maximum amount of strikes/misplays allowed before the game ends
+	MaxStrikeNum = 3
 )

@@ -16,7 +16,7 @@ type Suit struct {
 
 func (s *Suit) ColorValue(g *Game) int {
 	if len(s.ClueColors) > 1 {
-		log.Fatal("Dual-color variants are not currently implemented.")
+		logger.Fatal("Dual-color variants are not currently implemented.")
 	}
 
 	for i, color := range variants[g.Variant].ClueColors {
@@ -52,13 +52,13 @@ func variantsInit() {
 	}
 }
 
-// variantIsCardTouched returns true if a clue will touch a particular suit
+// variantIsCardTouched returns true if a clue will touch a particular suit.
 // For example, a yellow clue will not touch a green card in a normal game,
-// but it will the "Dual-Color" variant
+// but it will the "Dual-Color" variant.
 func variantIsCardTouched(g *Game, clue *Clue, card *Card) bool {
-	if clue.Type == clueTypeRank {
+	if clue.Type == ClueTypeRank {
 		return card.Rank == clue.Value
-	} else if clue.Type == clueTypeColor {
+	} else if clue.Type == ClueTypeColor {
 		color := variants[g.Variant].ClueColors[clue.Value]
 		colors := variants[g.Variant].Suits[card.Suit.Index].ClueColors
 		return stringInSlice(color, colors)

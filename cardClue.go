@@ -8,9 +8,9 @@ type CardClue struct {
 
 func (c *CardClue) Name(g *Game) string {
 	name := ""
-	if c.Type == clueTypeRank {
+	if c.Type == ClueTypeRank {
 		name = string(c.Value)
-	} else if c.Type == clueTypeColor {
+	} else if c.Type == ClueTypeColor {
 		name = variants[g.Variant].ClueColors[c.Value]
 	}
 	if !c.Positive {

@@ -1,6 +1,6 @@
 package main
 
-// We store extra information about each player
+// We store extra information about each player.
 type HyphenPlayer struct {
 	Index int
 }
@@ -15,19 +15,19 @@ func (hp *HyphenPlayer) GetChop(g *Game, d *Hyphenated) *Card {
 		}
 	}
 
-	// The hand is fully-clued, so just make the chop the left-most card
+	// The hand is fully-clued, so just make the chop the left-most card.
 	return p.Hand[len(p.Hand)-1]
 }
 
 // Now that a card has been clued,
-// update the possibilities for each card in this player's hand based on Good Touch Principle
+// update the possibilities for each card in this player's hand based on Good Touch Principle.
 func (hp *HyphenPlayer) UpdateHandGTP(g *Game, d *Hyphenated) {
 	p := g.Players[hp.Index]
 
 	for _, c := range p.Hand {
 		hc := d.Cards[c.Order]
 
-		// TODO: don't mark a card as playable if it is known trash
+		// TODO: don't mark a card as playable if it is known trash.
 		if c.Touched && !hc.Playable {
 			isplayable := true
 			for _, s := range c.PossibleSuits {
@@ -39,7 +39,7 @@ func (hp *HyphenPlayer) UpdateHandGTP(g *Game, d *Hyphenated) {
 				}
 			}
 			if isplayable {
-				log.Info(c.Name() + " in " + p.Name + "'s hand is playable now from Good Touch Principle.")
+				logger.Info(c.Name() + " in " + p.Name + "'s hand is playable now from Good Touch Principle.")
 				hc.Playable = true
 			}
 		}

@@ -37,8 +37,7 @@ Note that these steps require **an elevated (administrator) command-shell**.
   * `git config --global pull.rebase true` <br />
   (so that Git automatically rebases when pulling)
 * Clone the repository:
-  * `mkdir %GOPATH%\src\github.com\Zamiell`
-  * `cd %GOPATH%\src\github.com\Zamiell`
+  * `cd [the path where you want the code to live]` (optional)
   * If you already have an SSH keypair and have the public key attached to your GitHub profile, then use the following command to clone the repostory via SSH:
     * `git clone git@github.com:Zamiell/hanabi-bot.git`
   * If you do not already have an SSH keypair, then use the following command to clone the repository via HTTPS:
@@ -47,21 +46,17 @@ Note that these steps require **an elevated (administrator) command-shell**.
     * `git clone https://github.com/[Your_Username]/hanabi-bot.git`
 * Enter the cloned repository:
   * `cd hanabi-bot`
-* Install the Golang project dependencies:
-  * `go get -u -v ./...`
-* Install the Golang linter:
-  * `go get -u -v "github.com/golangci/golangci-lint/cmd/golangci-lint"`
+* Install the Golang project dependencies and build it:
+  * `go build`
+* Install [the Golang linter](https://golangci-lint.run/usage/install/#local-installation).
 * Install the VSCode extension for Golang:
   * `code --install-extension "ms-vscode.Go"`
-* Import a solid set of starting VSCode user settings:
-  * `copy "install\settings.json" "%APPDATA%\Code\User\settings.json"` <br />
-  (feel free to tweak this file to your liking)
 * Open VSCode using the cloned repository as the project folder:
   * `code .`
 * Test the Golang linter:
-  * On the left pane, navigate to and open "src\action.go".
+  * On the left pane, open "main.go".
   * In the bottom-right-hand corner, click on "Analysis Tools Missing" and then on "Install". You will know that it has finished once it displays: "All tools successfully installed."
-  * Add a new line of "asdf" somewhere, save the file, and watch as some "Problems" appear in the bottom pane.
+  * Add a new line of "test" somewhere, save the file, and watch as some "Problems" appear in the bottom pane.
 * Run the code:
   * Launch a Git Bash shell:
     * `"%PROGRAMFILES%\Git\bin\sh.exe"`

@@ -10,15 +10,16 @@ import (
 
 func HyphenatedActionAnnouncedClue(d *Hyphenated, g *Game, a *Action) {
 	interpretation := d.GetClueInterpretation(g, a)
+	clue := NewClue(a)
 	if interpretation == hyphenClueTypePlay {
-		focusedCard := d.GetClueFocus(g, a.Target, a.Clue)
+		focusedCard := d.GetClueFocus(g, a.Target, clue)
 		if focusedCard == nil {
-			log.Fatal("The focused card of a play clue is nil.")
+			logger.Fatal("The focused card of a play clue is nil.")
 			return
 		}
 		hc := d.Cards[focusedCard.Order]
 		hc.Playable = true
-		log.Debug(g.Players[d.Us].Name + " marked " + focusedCard.Name() + " on slot " + strconv.Itoa(focusedCard.Slot) + " as playable.")
+		logger.Debug(g.Players[d.Us].Name + " marked " + focusedCard.Name() + " on slot " + strconv.Itoa(focusedCard.Slot) + " as playable.")
 	}
 
 	//hp := d.Players[a.Target]
@@ -30,18 +31,19 @@ func HyphenatedActionAnnouncedClue(d *Hyphenated, g *Game, a *Action) {
 */
 
 func (d *Hyphenated) GetClueInterpretation(g *Game, a *Action) int {
-	focusedCard := d.GetClueFocus(g, a.Target, a.Clue)
+	clue := NewClue(a)
+	focusedCard := d.GetClueFocus(g, a.Target, clue)
 	hp := d.Players[a.Target]
 
 	if focusedCard == hp.GetChop(g, d) {
-		// It is focused on the chop, so check to see if this could be a Save Clue
-		if a.Clue.Type == clueTypeRank {
-			// 2 Saves and 5 Saves
-			if a.Clue.Value == 2 || a.Clue.Value == 5 {
+		// It is focused on the chop, so check to see if this could be a Save Clue.
+		if a.Type == ActionTypeRankClue {
+			// 2 Saves and 5 Saves.
+			if a.Value == 2 || a.Value == 5 {
 				return hyphenClueTypeSave
 			}
-		} else if a.Clue.Type == clueTypeColor {
-			// Check to see if the focused chop card "matches" anything in the discard pile
+		} else if a.Type == ActionTypeColorClue {
+			// Check to see if the focused chop card "matches" anything in the discard pile.
 			for _, c := range g.DiscardPile {
 				if c.NeedsToBePlayed(g) &&
 					focusedCard.CouldBeSuit(c.Suit) &&
