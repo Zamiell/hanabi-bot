@@ -50,7 +50,7 @@ Note that these steps require **an elevated (administrator) command-shell**.
   * `go build`
 * Install [the Golang linter](https://golangci-lint.run/usage/install/#local-installation).
 * Install the VSCode extension for Golang:
-  * `code --install-extension "ms-vscode.Go"`
+  * `code --install-extension "golang.go"`
 * Open VSCode using the cloned repository as the project folder:
   * `code .`
 * Test the Golang linter:
